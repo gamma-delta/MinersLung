@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "minerslung:block/wall_signal_torch",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "minerslung:block/wall_signal_torch",
+      "y": 90
+    },
+    "facing=west": {
+      "model": "minerslung:block/wall_signal_torch",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "minerslung:block/wall_signal_torch"
+    }
+  }
+}

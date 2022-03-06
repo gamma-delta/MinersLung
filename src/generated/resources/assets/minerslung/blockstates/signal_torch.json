@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "minerslung:block/signal_torch"
+    }
+  }
+}
