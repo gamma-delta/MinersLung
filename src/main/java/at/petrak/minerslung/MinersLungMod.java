@@ -4,6 +4,7 @@ import at.petrak.minerslung.client.ModModels;
 import at.petrak.minerslung.common.blocks.ModBlocks;
 import at.petrak.minerslung.common.blocks.SignalTorchBlock;
 import at.petrak.minerslung.common.breath.TickAirChecker;
+import at.petrak.minerslung.common.capability.ModCapabilities;
 import at.petrak.minerslung.common.items.ModItems;
 import at.petrak.minerslung.datagen.ModDataGenerators;
 import net.minecraftforge.api.distmarker.Dist;
@@ -38,6 +39,7 @@ public class MinersLungMod {
 
         evbus.register(TickAirChecker.class);
         evbus.register(SignalTorchBlock.class);
+        evbus.register(ModCapabilities.class);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             modbus.register(ModModels.class);

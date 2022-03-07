@@ -1,6 +1,7 @@
 package at.petrak.minerslung.common.breath;
 
 import at.petrak.minerslung.MinersLungConfig;
+import at.petrak.minerslung.common.capability.ModCapabilities;
 import at.petrak.minerslung.common.items.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffects;
@@ -56,7 +57,17 @@ public class AirHelper {
     }
 
     public static boolean isProtectedFromRed(LivingEntity entity) {
-        return entity instanceof ArmorStand || entity.canBreatheUnderwater() || entity instanceof Enemy || entity.hasEffect(
-            MobEffects.WATER_BREATHING);
+        var normalProt = entity instanceof ArmorStand
+            || entity.canBreatheUnderwater()
+            || entity instanceof Enemy
+            || entity.hasEffect(MobEffects.WATER_BREATHING);
+        if (normalProt) return true;
+
+        var cap = entity.getCapability(ModCapabilities.IS_USING_BLADDER).resolve();
+        if (cap.isPresent() && cap.get().isUsingBladder) {
+            return true;
+        }
+
+        return false;
     }
 }

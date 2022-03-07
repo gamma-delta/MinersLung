@@ -9,6 +9,7 @@ public class ModDataGenerators {
         var gen = evt.getGenerator();
         var efh = evt.getExistingFileHelper();
         if (evt.includeClient()) {
+            gen.addProvider(new ModItemModels(gen, efh));
             gen.addProvider(new ModBlockModels(gen, efh));
         }
     }
