@@ -1,0 +1,36 @@
+{
+  "parent": "minerslung:root",
+  "display": {
+    "icon": {
+      "item": "minerslung:air_bladder",
+      "nbt": "{Damage:0}"
+    },
+    "title": {
+      "translate": "advancement.minerslung:air_bladder"
+    },
+    "description": {
+      "translate": "advancement.minerslung:air_bladder.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "on_use": {
+      "trigger": "minecraft:using_item",
+      "conditions": {
+        "item": {
+          "items": [
+            "minerslung:air_bladder"
+          ]
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "on_use"
+    ]
+  ]
+}

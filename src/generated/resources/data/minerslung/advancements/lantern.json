@@ -1,0 +1,37 @@
+{
+  "parent": "minerslung:root",
+  "display": {
+    "icon": {
+      "item": "minerslung:fake_always_green_lantern"
+    },
+    "title": {
+      "translate": "advancement.minerslung:lantern"
+    },
+    "description": {
+      "translate": "advancement.minerslung:lantern.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "place": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minerslung:safety_lantern"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "place"
+    ]
+  ]
+}

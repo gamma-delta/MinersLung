@@ -1,13 +1,13 @@
 package at.petrak.minerslung.common.blocks;
 
 import at.petrak.minerslung.MinersLungConfig;
+import at.petrak.minerslung.common.advancement.ModAdvancementTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -37,11 +37,6 @@ public class SignalTorchBlock extends TorchBlock {
         pLevel.addParticle(this.flameParticle, x, y, z, 0.0D, 0.0D, 0.0D);
     }
 
-    @Override
-    public Item asItem() {
-        return Items.TORCH;
-    }
-
     @SubscribeEvent
     public static void switchTorchType(PlayerInteractEvent.RightClickBlock evt) {
         var player = evt.getPlayer();
@@ -65,6 +60,10 @@ public class SignalTorchBlock extends TorchBlock {
             pitch = 0.8f;
         }
         if (nextBlock != null) {
+            if (player instanceof ServerPlayer splayer) {
+                ModAdvancementTriggers.SIGNALIFICATE_TORCH.trigger(splayer, pos);
+            }
+
             var nextBs = nextBlock.defaultBlockState();
             if (bs.hasProperty(WallTorchBlock.FACING)) {
                 nextBs = nextBs.setValue(WallTorchBlock.FACING, bs.getValue(WallTorchBlock.FACING));
@@ -72,6 +71,7 @@ public class SignalTorchBlock extends TorchBlock {
             player.level.setBlockAndUpdate(pos, nextBs);
             player.level.playSound(player, pos, SoundEvents.FLINTANDSTEEL_USE, SoundSource.BLOCKS, 1f, pitch);
             player.swing(evt.getHand());
+            
             evt.setUseItem(Event.Result.DENY);
         }
     }

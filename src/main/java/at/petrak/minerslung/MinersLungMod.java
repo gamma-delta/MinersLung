@@ -1,6 +1,7 @@
 package at.petrak.minerslung;
 
-import at.petrak.minerslung.client.ModModels;
+import at.petrak.minerslung.client.ModClientRenderingAndModelStuff;
+import at.petrak.minerslung.common.advancement.ModAdvancementTriggers;
 import at.petrak.minerslung.common.blocks.ModBlocks;
 import at.petrak.minerslung.common.blocks.SignalTorchBlock;
 import at.petrak.minerslung.common.breath.TickAirChecker;
@@ -42,9 +43,11 @@ public class MinersLungMod {
         evbus.register(ModCapabilities.class);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            modbus.register(ModModels.class);
+            modbus.register(ModClientRenderingAndModelStuff.class);
         });
 
+
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG_SPEC);
+        ModAdvancementTriggers.registerTriggers();
     }
 }

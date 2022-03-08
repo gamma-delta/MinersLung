@@ -1,7 +1,7 @@
 package at.petrak.minerslung.common.items;
 
 import at.petrak.minerslung.common.breath.AirHelper;
-import at.petrak.minerslung.common.breath.OxygenLevel;
+import at.petrak.minerslung.common.breath.AirQualityLevel;
 import at.petrak.minerslung.common.capability.ModCapabilities;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,14 +33,14 @@ public class AirBladderItem extends Item {
 
     @Override
     public void onUsingTick(ItemStack stack, LivingEntity player, int count) {
-        var o2Level = AirHelper.getO2LevelFromLocation(player);
+        var o2Level = AirHelper.getO2LevelFromLocation(player.getEyePosition(), player.level);
         stack.getOrCreateTag().putString(TAG_OXYGEN_LEVEL, o2Level.toString());
 
         ServerPlayer maybeSplayer = null;
         if (player instanceof ServerPlayer splayer) {
             maybeSplayer = splayer;
         }
-        if (o2Level == OxygenLevel.GREEN) {
+        if (o2Level == AirQualityLevel.GREEN) {
             // refill
             stack.hurt(-4, player.getRandom(), maybeSplayer);
         } else if (stack.getDamageValue() < stack.getMaxDamage()) {
@@ -77,8 +77,8 @@ public class AirBladderItem extends Item {
             if (tag.contains(TAG_OXYGEN_LEVEL, Tag.TAG_STRING)) {
                 var o2LevelStr = tag.getString(TAG_OXYGEN_LEVEL);
                 try {
-                    var o2Level = OxygenLevel.valueOf(o2LevelStr);
-                    out = (o2Level == OxygenLevel.GREEN) ? UseAnim.BOW : UseAnim.DRINK;
+                    var o2Level = AirQualityLevel.valueOf(o2LevelStr);
+                    out = (o2Level == AirQualityLevel.GREEN) ? UseAnim.BOW : UseAnim.DRINK;
                 } catch (IllegalArgumentException ignored) {
                 }
             }

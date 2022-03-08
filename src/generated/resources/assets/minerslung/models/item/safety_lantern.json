@@ -1,0 +1,22 @@
+{
+  "overrides": [
+    {
+      "predicate": {
+        "minerslung:air_quality": 0.0
+      },
+      "model": "minerslung:item/lantern_red"
+    },
+    {
+      "predicate": {
+        "minerslung:air_quality": 1.0
+      },
+      "model": "minerslung:item/lantern_yellow"
+    },
+    {
+      "predicate": {
+        "minerslung:air_quality": 2.0
+      },
+      "model": "minerslung:item/lantern_green"
+    }
+  ]
+}

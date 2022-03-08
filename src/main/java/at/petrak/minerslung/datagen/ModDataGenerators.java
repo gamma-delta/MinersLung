@@ -12,5 +12,10 @@ public class ModDataGenerators {
             gen.addProvider(new ModItemModels(gen, efh));
             gen.addProvider(new ModBlockModels(gen, efh));
         }
+        if (evt.includeServer()) {
+            gen.addProvider(new ModBlockTagsProvider(gen, efh));
+            gen.addProvider(new ModLootTablesProvider(gen));
+            gen.addProvider(new ModAdvancementProvider(gen, efh));
+        }
     }
 }

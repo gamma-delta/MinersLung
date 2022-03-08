@@ -1,0 +1,38 @@
+{
+  "parent": "minerslung:root",
+  "display": {
+    "icon": {
+      "item": "minecraft:torch"
+    },
+    "title": {
+      "translate": "advancement.minerslung:signal_torch"
+    },
+    "description": {
+      "translate": "advancement.minerslung:signal_torch.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "use": {
+      "trigger": "minerslung:signalificate_torch",
+      "conditions": {
+        "location": {
+          "block": {
+            "blocks": [
+              "minecraft:torch",
+              "minecraft:wall_torch"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "use"
+    ]
+  ]
+}

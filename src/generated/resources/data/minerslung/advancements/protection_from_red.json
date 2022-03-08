@@ -1,0 +1,35 @@
+{
+  "parent": "minerslung:protection_from_yellow",
+  "display": {
+    "icon": {
+      "item": "minecraft:potion",
+      "nbt": "{Potion:\"minecraft:water_breathing\"}"
+    },
+    "title": {
+      "translate": "advancement.minerslung:protection_from_red"
+    },
+    "description": {
+      "translate": "advancement.minerslung:protection_from_red.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "protecc": {
+      "trigger": "minerslung:breathe_bad_air",
+      "conditions": {
+        "air_quality": "RED",
+        "protection": true,
+        "underwater_ok": true,
+        "bladder_ok": false
+      }
+    }
+  },
+  "requirements": [
+    [
+      "protecc"
+    ]
+  ]
+}

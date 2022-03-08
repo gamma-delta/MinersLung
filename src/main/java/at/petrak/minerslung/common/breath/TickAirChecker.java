@@ -1,5 +1,7 @@
 package at.petrak.minerslung.common.breath;
 
+import at.petrak.minerslung.common.advancement.ModAdvancementTriggers;
+import at.petrak.minerslung.common.capability.ModCapabilities;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -19,12 +21,14 @@ public class TickAirChecker {
         var e = evt.getEntityLiving();
         var world = e.level;
 
-        var o2Level = AirHelper.getO2LevelFromLocation(e);
+        var o2Level = AirHelper.getO2LevelFromLocation(e.getEyePosition(), e.level);
         var deltaO2 = 0;
+        var wasProtected = false;
         switch (o2Level) {
             case GREEN -> deltaO2 = 4;
             case YELLOW -> {
                 Optional<ItemStack> yellowProt = AirHelper.getProtectionFromYellow(e);
+                wasProtected = yellowProt != null;
                 if (yellowProt == null) {
                     if (world.getGameTime() % 4 == 0) {
                         deltaO2 = -1;
@@ -38,10 +42,22 @@ public class TickAirChecker {
                 }
             }
             case RED -> {
-                if (!AirHelper.isProtectedFromRed(e)) {
+                var redProt = AirHelper.isProtectedFromRed(e);
+                wasProtected = redProt;
+                if (!redProt) {
                     deltaO2 = -1;
                 }
             }
+        }
+
+        if (e instanceof ServerPlayer splayer) {
+            var usedBladder = false;
+            var cap = splayer.getCapability(ModCapabilities.IS_USING_BLADDER).resolve();
+            if (cap.isPresent() && cap.get().isUsingBladder) {
+                usedBladder = true;
+            }
+            ModAdvancementTriggers.BREATHE_AIR.trigger(splayer,
+                o2Level, wasProtected, AirHelper.isUnderwater(splayer.getEyePosition(), splayer.level), usedBladder);
         }
 
         if (deltaO2 != 0) {

@@ -2,8 +2,6 @@ package at.petrak.minerslung.common.blocks;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.WallTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -13,11 +11,6 @@ import java.util.Random;
 public class WallSignalTorchBlock extends WallTorchBlock {
     public WallSignalTorchBlock(Properties pProperties) {
         super(pProperties, ParticleTypes.FLAME);
-    }
-
-    @Override
-    public Item asItem() {
-        return Items.TORCH;
     }
 
     @Override

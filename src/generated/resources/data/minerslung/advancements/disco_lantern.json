@@ -1,0 +1,51 @@
+{
+  "parent": "minerslung:lantern",
+  "display": {
+    "icon": {
+      "item": "minerslung:fake_rainbow_lantern"
+    },
+    "title": {
+      "translate": "advancement.minerslung:disco_lantern"
+    },
+    "description": {
+      "translate": "advancement.minerslung:disco_lantern.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "red": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "item": {
+          "tag": "forge:dyes/red"
+        }
+      }
+    },
+    "yellow": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "item": {
+          "tag": "forge:dyes/yellow"
+        }
+      }
+    },
+    "green": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "item": {
+          "tag": "forge:dyes/green"
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "red",
+      "yellow",
+      "green"
+    ]
+  ]
+}

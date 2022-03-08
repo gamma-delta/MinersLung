@@ -9,32 +9,38 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
 public class AirHelper {
-    public static OxygenLevel getO2LevelFromLocation(LivingEntity entity) {
-        if (entity.canBreatheUnderwater() || entity instanceof Enemy) {
-            return OxygenLevel.GREEN;
+    /**
+     * Get the "actual" air quality of the location.
+     */
+    public static AirQualityLevel getO2LevelFromLocation(Vec3 position, Level world) {
+        if (isUnderwater(position, world)) {
+            return AirQualityLevel.RED;
         }
-        var blockAtEyes = entity.level.getBlockState(new BlockPos(entity.getX(), entity.getEyeY(), entity.getZ()));
-        if (!blockAtEyes.getFluidState().isEmpty() && !blockAtEyes.is(Blocks.BUBBLE_COLUMN)) {
-            return OxygenLevel.RED;
-        }
-        var dim = entity.level.dimension().location().toString();
+        var dim = world.dimension().location().toString();
         if (MinersLungConfig.noOxygenDimensions.get().contains(dim)) {
-            return OxygenLevel.RED;
+            return AirQualityLevel.RED;
         } else if (MinersLungConfig.poorOxygenDimensions.get().contains(dim)) {
-            return OxygenLevel.YELLOW;
+            return AirQualityLevel.YELLOW;
         } else if (MinersLungConfig.getPoorOxygenThresholdDims().containsKey(dim)) {
             var depth = MinersLungConfig.getPoorOxygenThresholdDims().get(dim);
-            if (entity.getY() < depth) {
-                return OxygenLevel.YELLOW;
+            if (position.y < depth) {
+                return AirQualityLevel.YELLOW;
             }
         }
-        return OxygenLevel.GREEN;
+        return AirQualityLevel.GREEN;
+    }
+
+    public static boolean isUnderwater(Vec3 position, Level world) {
+        var blockAtEyes = world.getBlockState(new BlockPos(position));
+        return !blockAtEyes.getFluidState().isEmpty() && !blockAtEyes.is(Blocks.BUBBLE_COLUMN);
     }
 
     /**
@@ -61,7 +67,9 @@ public class AirHelper {
             || entity.canBreatheUnderwater()
             || entity instanceof Enemy
             || entity.hasEffect(MobEffects.WATER_BREATHING);
-        if (normalProt) return true;
+        if (normalProt) {
+            return true;
+        }
 
         var cap = entity.getCapability(ModCapabilities.IS_USING_BLADDER).resolve();
         if (cap.isPresent() && cap.get().isUsingBladder) {

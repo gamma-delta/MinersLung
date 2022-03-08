@@ -1,0 +1,34 @@
+{
+  "display": {
+    "icon": {
+      "item": "minerslung:fake_always_red_lantern"
+    },
+    "title": {
+      "translate": "advancement.minerslung:root"
+    },
+    "description": {
+      "translate": "advancement.minerslung:root.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false,
+    "background": "minecraft:textures/block/deepslate.png"
+  },
+  "criteria": {
+    "on_yellow": {
+      "trigger": "minerslung:breathe_bad_air",
+      "conditions": {
+        "air_quality": "YELLOW",
+        "protection": false,
+        "underwater_ok": false,
+        "bladder_ok": false
+      }
+    }
+  },
+  "requirements": [
+    [
+      "on_yellow"
+    ]
+  ]
+}

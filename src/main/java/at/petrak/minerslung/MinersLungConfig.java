@@ -16,7 +16,7 @@ public class MinersLungConfig {
 
     private static Map<String, Integer> poorOxygenThresholdDims = null;
 
-    private static final Pattern THRESHOLD_PATTERN = Pattern.compile("([-_a-zA-Z0-9.\\/:]+)=(-?\\d+)");
+    private static final Pattern THRESHOLD_PATTERN = Pattern.compile("([-_a-zA-Z0-9./:]+)=(-?\\d+)");
 
     public MinersLungConfig(ForgeConfigSpec.Builder builder) {
         poorOxygenDimensions = builder

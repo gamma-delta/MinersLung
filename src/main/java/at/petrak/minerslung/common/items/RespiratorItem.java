@@ -37,7 +37,7 @@ public class RespiratorItem extends ArmorItem {
 
         @Override
         public Ingredient getRepairIngredient() {
-            return Ingredient.of(Items.PAPER);
+            return Ingredient.of(Items.CHARCOAL);
         }
 
         @Override
