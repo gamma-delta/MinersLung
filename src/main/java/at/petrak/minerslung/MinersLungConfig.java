@@ -13,6 +13,7 @@ public class MinersLungConfig {
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> noOxygenDimensions;
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> poorOxygenWithThresholdDimensions;
     public static ForgeConfigSpec.BooleanValue enableSignalTorches;
+    public static ForgeConfigSpec.IntValue drownedChoking;
 
     private static Map<String, Integer> poorOxygenThresholdDims = null;
 
@@ -42,6 +43,10 @@ public class MinersLungConfig {
         enableSignalTorches = builder
             .comment("Whether to allow right-clicking torches to make them spray particle effects")
             .define("enableSignalTorches", true);
+
+        drownedChoking = builder
+            .comment("How much air a Drowned attack removes")
+            .defineInRange("drownedChoking", 30, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     public static Map<String, Integer> getPoorOxygenThresholdDims() {

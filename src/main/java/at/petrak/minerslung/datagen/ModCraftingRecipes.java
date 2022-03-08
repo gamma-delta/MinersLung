@@ -61,13 +61,13 @@ public class ModCraftingRecipes extends RecipeProvider {
             .pattern("GPG")
             .pattern(" G ")
             .unlockedBy("namesarehard", yellowTrigger)
-            .save(recipes);
+            .save(recipes, "prismarine_bottle_from_glass");
 
         ShapelessRecipeBuilder.shapeless(ModItems.PRISMARINE_BOTTLE.get(), 3)
             .requires(Items.GLASS_BOTTLE, 3)
             .requires(Ingredient.m_204132_(Tags.Items.GEMS_PRISMARINE))
             .unlockedBy("namesarehard", yellowTrigger)
-            .save(recipes);
+            .save(recipes, "prismarine_bottle");
 
     }
 }

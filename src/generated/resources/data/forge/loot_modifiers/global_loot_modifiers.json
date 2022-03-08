@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "entries": [
+    "minerslung:safety_lantern_mineshaft",
+    "minerslung:safety_lantern_dungeon",
+    "minerslung:prismarine_bottle_buried",
+    "minerslung:prismarine_bottle_big_ruin",
+    "minerslung:prismarine_bottle_small_ruin",
+    "minerslung:prismarine_bottle_shipwreck",
+    "minerslung:safety_lantern_stronghold"
+  ]
+}

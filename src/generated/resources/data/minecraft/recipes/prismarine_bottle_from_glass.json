@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GPG",
+    " G "
+  ],
+  "key": {
+    "G": {
+      "tag": "forge:glass"
+    },
+    "P": {
+      "tag": "forge:gems/prismarine"
+    }
+  },
+  "result": {
+    "item": "minerslung:prismarine_bottle",
+    "count": 3
+  }
+}

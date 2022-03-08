@@ -1,6 +1,7 @@
 {
     "item.minerslung.respirator": "Respirator",
     "item.minerslung.air_bladder": "Air Bladder",
+    "item.minerslung.prismarine_bottle": "Bottle of Prismarine",
 
     "block.minerslung.safety_lantern": "Safety Lantern",
 
@@ -18,7 +19,6 @@
     "advancement.minerslung:lantern.desc": "Use a Safety Lantern to check the air quality around you",
     "advancement.minerslung:disco_lantern": "Red Light! Green Light!",
     "advancement.minerslung:disco_lantern.desc": "Use a piece of Dye to manually change the color of a Safety Lamp (you can scrape the color off with an axe)",
-    "advancement.minerslung:signal_torch": "Ooh, ES-CAPE!",
+    "advancement.minerslung:signal_torch": "Ooh, ES-CAPE",
     "advancement.minerslung:signal_torch.desc": "Right-click a torch to make it spew particles, perhaps to signal the exit of a cave"
-
 }
