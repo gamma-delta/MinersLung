@@ -19,7 +19,7 @@ public class ModItemModels extends ItemModelProvider {
     protected void registerModels() {
         simpleItem(ModItems.RESPIRATOR.get());
         simpleItem(ModItems.AIR_BLADDER.get());
-        simpleItem(ModItems.PRISMARINE_BOTTLE.get());
+        simpleItem(ModItems.SOULFIRE_BOTTLE.get());
 
         AirQualityLevel[] aqs = AirQualityLevel.values();
         for (int i = 0; i < aqs.length; i++) {

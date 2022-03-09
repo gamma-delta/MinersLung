@@ -49,12 +49,12 @@ public class ModAdvancementProvider extends AdvancementProvider {
             .save(advancements, prefix("air_bladder"));
 
         Advancement.Builder.advancement()
-            .display(simple(ModItems.PRISMARINE_BOTTLE.get(), "prismarine_bottle", FrameType.GOAL))
+            .display(simple(ModItems.SOULFIRE_BOTTLE.get(), "soulfire_bottle", FrameType.GOAL))
             .parent(bladder)
             .addCriterion("on_use",
                 new ConsumeItemTrigger.TriggerInstance(EntityPredicate.Composite.ANY,
-                    ItemPredicate.Builder.item().of(ModItems.PRISMARINE_BOTTLE.get()).build()))
-            .save(advancements, prefix("prismarine_bottle"));
+                    ItemPredicate.Builder.item().of(ModItems.SOULFIRE_BOTTLE.get()).build()))
+            .save(advancements, prefix("soulfire_bottle"));
 
         var protectYellow = Advancement.Builder.advancement()
             .display(simple(ModItems.RESPIRATOR.get(), "protection_from_yellow", FrameType.TASK))

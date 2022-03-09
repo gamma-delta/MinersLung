@@ -3,6 +3,7 @@ package at.petrak.minerslung.datagen;
 import at.petrak.minerslung.common.advancement.BreatheAirTrigger;
 import at.petrak.minerslung.common.breath.AirQualityLevel;
 import at.petrak.minerslung.common.items.ModItems;
+import net.minecraft.advancements.critereon.ChangeDimensionTrigger;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
@@ -11,6 +12,7 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.Tags;
 
 import java.util.function.Consumer;
@@ -25,6 +27,9 @@ public class ModCraftingRecipes extends RecipeProvider {
         var yellowTrigger = new BreatheAirTrigger.Instance(EntityPredicate.Composite.ANY, AirQualityLevel.YELLOW, false,
             true,
             true);
+        var netherTrigger = ChangeDimensionTrigger.TriggerInstance.changedDimensionTo(Level.NETHER);
+
+
         ShapedRecipeBuilder.shaped(ModItems.RESPIRATOR.get())
             .define('P', Items.PAPER)
             .define('S', Items.STRING)
@@ -55,19 +60,22 @@ public class ModCraftingRecipes extends RecipeProvider {
             .unlockedBy("namesarehard", yellowTrigger)
             .save(recipes);
 
-        ShapedRecipeBuilder.shaped(ModItems.PRISMARINE_BOTTLE.get(), 3)
+        ShapedRecipeBuilder.shaped(ModItems.SOULFIRE_BOTTLE.get(), 3)
             .define('G', Ingredient.m_204132_(Tags.Items.GLASS))
-            .define('P', Ingredient.m_204132_(Tags.Items.GEMS_PRISMARINE))
-            .pattern("GPG")
+            .define('S', Ingredient.of(Items.SOUL_SAND, Items.SOUL_SOIL))
+            .define('C', Ingredient.of(Items.CHARCOAL, Items.COAL))
+            .pattern(" C ")
+            .pattern("GSG")
             .pattern(" G ")
-            .unlockedBy("namesarehard", yellowTrigger)
-            .save(recipes, "prismarine_bottle_from_glass");
+            .unlockedBy("namesarehard", netherTrigger)
+            .save(recipes, "soulfire_bottle_from_glass");
 
-        ShapelessRecipeBuilder.shapeless(ModItems.PRISMARINE_BOTTLE.get(), 3)
+        ShapelessRecipeBuilder.shapeless(ModItems.SOULFIRE_BOTTLE.get(), 3)
             .requires(Items.GLASS_BOTTLE, 3)
-            .requires(Ingredient.m_204132_(Tags.Items.GEMS_PRISMARINE))
-            .unlockedBy("namesarehard", yellowTrigger)
-            .save(recipes, "prismarine_bottle");
+            .requires(Ingredient.of(Items.SOUL_SAND, Items.SOUL_SOIL))
+            .requires(Ingredient.of(Items.CHARCOAL, Items.COAL))
+            .unlockedBy("namesarehard", netherTrigger)
+            .save(recipes);
 
     }
 }

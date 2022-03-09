@@ -32,5 +32,6 @@ public class ModBlocks {
                 case YELLOW -> 12;
                 case RED -> 9;
             })
+            .randomTicks()
             .noOcclusion()));
 }

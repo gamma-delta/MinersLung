@@ -18,8 +18,8 @@ public class ModItems {
     public static RegistryObject<AirBladderItem> AIR_BLADDER = ITEMS.register("air_bladder",
         () -> new AirBladderItem(
             new Item.Properties().stacksTo(1).durability(300).defaultDurability(0).tab(CreativeModeTab.TAB_TOOLS)));
-    public static RegistryObject<PrismarineBottleItem> PRISMARINE_BOTTLE = ITEMS.register("prismarine_bottle",
-        () -> new PrismarineBottleItem(new Item.Properties().tab(CreativeModeTab.TAB_TOOLS)));
+    public static RegistryObject<SoulfireBottleItem> SOULFIRE_BOTTLE = ITEMS.register("soulfire_bottle",
+        () -> new SoulfireBottleItem(new Item.Properties().tab(CreativeModeTab.TAB_TOOLS)));
 
     public static RegistryObject<BlockItem> SAFETY_LANTERN = ITEMS.register("safety_lantern",
         () -> new BlockItem(ModBlocks.SAFETY_LANTERN.get(),

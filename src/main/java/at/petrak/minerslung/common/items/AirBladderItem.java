@@ -26,7 +26,7 @@ public class AirBladderItem extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
-        var maybeCap = pPlayer.getCapability(ModCapabilities.IS_USING_BLADDER).resolve();
+        var maybeCap = pPlayer.getCapability(ModCapabilities.IS_PROTECTED_FROM_AIR).resolve();
         maybeCap.ifPresent(cap -> cap.isUsingBladder = true);
         return ItemUtils.startUsingInstantly(pLevel, pPlayer, pUsedHand);
     }
@@ -45,10 +45,14 @@ public class AirBladderItem extends Item {
             stack.hurt(-4, player.getRandom(), maybeSplayer);
         } else if (stack.getDamageValue() < stack.getMaxDamage()) {
             // damage and replenish air
-            stack.hurt(1, player.getRandom(), maybeSplayer);
-            if (player.getAirSupply() < player.getMaxAirSupply()) {
-                player.setAirSupply(player.getAirSupply() + 1);
+            for (int i = 0; i < 4; i++) {
+                var worked = stack.hurt(1, player.getRandom(), maybeSplayer);
+                if (!worked) break;
+                if (player.getAirSupply() < player.getMaxAirSupply()) {
+                    player.setAirSupply(player.getAirSupply() + 1);
+                }
             }
+
         }
     }
 
@@ -65,7 +69,7 @@ public class AirBladderItem extends Item {
 
     public static void stopUsing(ItemStack stack, LivingEntity user) {
         stack.removeTagKey(TAG_OXYGEN_LEVEL);
-        var maybeCap = user.getCapability(ModCapabilities.IS_USING_BLADDER).resolve();
+        var maybeCap = user.getCapability(ModCapabilities.IS_PROTECTED_FROM_AIR).resolve();
         maybeCap.ifPresent(cap -> cap.isUsingBladder = false);
     }
 

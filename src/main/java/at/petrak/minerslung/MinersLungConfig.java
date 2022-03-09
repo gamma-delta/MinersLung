@@ -14,6 +14,9 @@ public class MinersLungConfig {
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> poorOxygenWithThresholdDimensions;
     public static ForgeConfigSpec.BooleanValue enableSignalTorches;
     public static ForgeConfigSpec.IntValue drownedChoking;
+    public static ForgeConfigSpec.DoubleValue soulFireRange;
+    public static ForgeConfigSpec.DoubleValue soulCampfireRange;
+    public static ForgeConfigSpec.DoubleValue soulTorchRange;
 
     private static Map<String, Integer> poorOxygenThresholdDims = null;
 
@@ -47,6 +50,17 @@ public class MinersLungConfig {
         drownedChoking = builder
             .comment("How much air a Drowned attack removes")
             .defineInRange("drownedChoking", 30, Integer.MIN_VALUE, Integer.MAX_VALUE);
+
+        soulTorchRange = builder
+            .comment("The radius a soul torch projects a bubble of breathable air around it",
+                "Peculiar things may happen if you change this, but breaking and replacing should fix it")
+            .defineInRange("soulCampfireRange", 2.0, 0.0, 32.0);
+        soulFireRange = builder
+            .comment("The radius a soul fire projects a bubble of breathable air around it")
+            .defineInRange("soulCampfireRange", 5.0, 0.0, 32.0);
+        soulCampfireRange = builder
+            .comment("The radius a soul campfire projects a bubble of breathable air around it")
+            .defineInRange("soulCampfireRange", 9.0, 0.0, 32.0);
     }
 
     public static Map<String, Integer> getPoorOxygenThresholdDims() {

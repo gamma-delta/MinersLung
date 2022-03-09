@@ -55,7 +55,7 @@ public class ModLootMods extends GlobalLootModifierProvider {
     private static class PrismarineBottleSer extends GenericAddItemModifier.Serializer {
         @Override
         public ItemStack getItem() {
-            return new ItemStack(ModItems.PRISMARINE_BOTTLE.get());
+            return new ItemStack(ModItems.SOULFIRE_BOTTLE.get());
         }
     }
 

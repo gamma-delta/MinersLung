@@ -52,7 +52,7 @@ public class TickAirChecker {
 
         if (e instanceof ServerPlayer splayer) {
             var usedBladder = false;
-            var cap = splayer.getCapability(ModCapabilities.IS_USING_BLADDER).resolve();
+            var cap = splayer.getCapability(ModCapabilities.IS_PROTECTED_FROM_AIR).resolve();
             if (cap.isPresent() && cap.get().isUsingBladder) {
                 usedBladder = true;
             }

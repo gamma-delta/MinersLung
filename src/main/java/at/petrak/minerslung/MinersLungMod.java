@@ -4,10 +4,13 @@ import at.petrak.minerslung.client.ModClientRenderingAndModelStuff;
 import at.petrak.minerslung.common.advancement.ModAdvancementTriggers;
 import at.petrak.minerslung.common.blocks.ModBlocks;
 import at.petrak.minerslung.common.blocks.SignalTorchBlock;
+import at.petrak.minerslung.common.breath.AirBubbleTracker;
 import at.petrak.minerslung.common.breath.DrownedOxygent;
+import at.petrak.minerslung.common.breath.ModPointsOfInterest;
 import at.petrak.minerslung.common.breath.TickAirChecker;
 import at.petrak.minerslung.common.capability.ModCapabilities;
 import at.petrak.minerslung.common.items.ModItems;
+import at.petrak.minerslung.common.network.ModMessages;
 import at.petrak.minerslung.datagen.ModDataGenerators;
 import at.petrak.minerslung.datagen.lootmods.ModLootMods;
 import net.minecraftforge.api.distmarker.Dist;
@@ -18,10 +21,14 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(MinersLungMod.MOD_ID)
 public class MinersLungMod {
     public static final String MOD_ID = "minerslung";
+
+    public static Logger LOGGER = LogManager.getLogger();
 
     private static final MinersLungConfig CONFIG;
     private static final ForgeConfigSpec CONFIG_SPEC;
@@ -39,12 +46,14 @@ public class MinersLungMod {
         ModItems.ITEMS.register(modbus);
         ModBlocks.BLOCKS.register(modbus);
         ModLootMods.LOOT_MODS.register(modbus);
+        ModPointsOfInterest.POIS.register(modbus);
         modbus.register(ModDataGenerators.class);
 
         evbus.register(TickAirChecker.class);
         evbus.register(SignalTorchBlock.class);
         evbus.register(ModCapabilities.class);
         evbus.register(DrownedOxygent.class);
+        evbus.register(AirBubbleTracker.class);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             modbus.register(ModClientRenderingAndModelStuff.class);
@@ -52,5 +61,6 @@ public class MinersLungMod {
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, CONFIG_SPEC);
         ModAdvancementTriggers.registerTriggers();
+        ModMessages.register();
     }
 }

@@ -26,4 +26,8 @@ public enum AirQualityLevel implements StringRepresentable {
     public String getSerializedName() {
         return this.serializedName;
     }
+
+    public boolean isBetterThan(AirQualityLevel other) {
+        return this.ordinal() < other.ordinal();
+    }
 }
