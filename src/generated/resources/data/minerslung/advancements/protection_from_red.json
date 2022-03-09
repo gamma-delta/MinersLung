@@ -20,10 +20,10 @@
     "protecc": {
       "trigger": "minerslung:breathe_bad_air",
       "conditions": {
-        "air_quality": "RED",
-        "protection": true,
-        "underwater_ok": true,
-        "bladder_ok": false
+        "air_qualities": [
+          "red"
+        ],
+        "protection": "any"
       }
     }
   },

@@ -9,10 +9,11 @@
     "namesarehard": {
       "trigger": "minerslung:breathe_bad_air",
       "conditions": {
-        "air_quality": "YELLOW",
-        "protection": false,
-        "underwater_ok": true,
-        "bladder_ok": true
+        "air_qualities": [
+          "yellow",
+          "red"
+        ],
+        "protection": "none"
       }
     },
     "has_the_recipe": {

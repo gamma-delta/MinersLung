@@ -17,20 +17,20 @@
     "hidden": false
   },
   "criteria": {
-    "on_use": {
-      "trigger": "minecraft:using_item",
+    "bad_air": {
+      "trigger": "minerslung:breathe_bad_air",
       "conditions": {
-        "item": {
-          "items": [
-            "minerslung:air_bladder"
-          ]
-        }
+        "air_qualities": [
+          "yellow",
+          "red"
+        ],
+        "protection": "bladder"
       }
     }
   },
   "requirements": [
     [
-      "on_use"
+      "bad_air"
     ]
   ]
 }

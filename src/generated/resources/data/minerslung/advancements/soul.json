@@ -1,28 +1,31 @@
 {
+  "parent": "minerslung:air_bladder",
   "display": {
     "icon": {
-      "item": "minerslung:fake_always_red_lantern"
+      "item": "minecraft:soul_campfire"
     },
     "title": {
-      "translate": "advancement.minerslung:root"
+      "translate": "advancement.minerslung:soul"
     },
     "description": {
-      "translate": "advancement.minerslung:root.desc"
+      "translate": "advancement.minerslung:soul.desc"
     },
     "frame": "task",
     "show_toast": true,
     "announce_to_chat": true,
-    "hidden": false,
-    "background": "minecraft:textures/block/deepslate.png"
+    "hidden": false
   },
   "criteria": {
     "bad_air": {
       "trigger": "minerslung:breathe_bad_air",
       "conditions": {
         "air_qualities": [
+          "green",
+          "blue",
           "yellow",
           "red"
-        ]
+        ],
+        "air_source": "soul"
       }
     }
   },

@@ -1,10 +1,13 @@
 package at.petrak.minerslung.datagen;
 
 import at.petrak.minerslung.MinersLungMod;
+import at.petrak.minerslung.common.advancement.AirProtectionSource;
+import at.petrak.minerslung.common.advancement.AirSource;
 import at.petrak.minerslung.common.advancement.BreatheAirTrigger;
 import at.petrak.minerslung.common.advancement.SignalificateTorchTrigger;
 import at.petrak.minerslung.common.breath.AirQualityLevel;
 import at.petrak.minerslung.common.items.ModItems;
+import com.mojang.datafixers.util.Either;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.advancements.FrameType;
@@ -13,6 +16,7 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.advancements.AdvancementProvider;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Unit;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionUtils;
@@ -22,6 +26,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
+import java.util.EnumSet;
 import java.util.function.Consumer;
 
 public class ModAdvancementProvider extends AdvancementProvider {
@@ -35,22 +40,31 @@ public class ModAdvancementProvider extends AdvancementProvider {
         var root = Advancement.Builder.advancement()
             .display(simpleWithBackground(ModItems.FAKE_ALWAYS_RED_LANTERN.get(), "root", FrameType.TASK,
                 new ResourceLocation("textures/block/deepslate.png")))
-            .addCriterion("on_yellow",
-                new BreatheAirTrigger.Instance(EntityPredicate.Composite.ANY, AirQualityLevel.YELLOW, false, false,
-                    false))
+            .addCriterion("bad_air",
+                new BreatheAirTrigger.Instance(EntityPredicate.Composite.ANY,
+                    EnumSet.of(AirQualityLevel.YELLOW, AirQualityLevel.RED), null, null))
             .save(advancements, prefix("root"));
 
         var bladder = Advancement.Builder.advancement()
             .display(simple(ModItems.AIR_BLADDER.get(), "air_bladder", FrameType.TASK))
             .parent(root)
-            .addCriterion("on_use",
-                new UsingItemTrigger.TriggerInstance(EntityPredicate.Composite.ANY, ItemPredicate.Builder.item()
-                    .of(ModItems.AIR_BLADDER.get()).build()))
+            .addCriterion("bad_air",
+                new BreatheAirTrigger.Instance(EntityPredicate.Composite.ANY,
+                    EnumSet.of(AirQualityLevel.YELLOW, AirQualityLevel.RED), null,
+                    Either.left(AirProtectionSource.BLADDER)))
             .save(advancements, prefix("air_bladder"));
 
-        Advancement.Builder.advancement()
-            .display(simple(ModItems.SOULFIRE_BOTTLE.get(), "soulfire_bottle", FrameType.GOAL))
+        var soul = Advancement.Builder.advancement()
+            .display(simple(Items.SOUL_CAMPFIRE, "soul", FrameType.TASK))
             .parent(bladder)
+            .addCriterion("bad_air",
+                new BreatheAirTrigger.Instance(EntityPredicate.Composite.ANY, EnumSet.allOf(AirQualityLevel.class),
+                    AirSource.SOUL, null))
+            .save(advancements, prefix("soul"));
+
+        Advancement.Builder.advancement()
+            .display(simple(ModItems.SOULFIRE_BOTTLE.get(), "soulfire_bottle", FrameType.TASK))
+            .parent(soul)
             .addCriterion("on_use",
                 new ConsumeItemTrigger.TriggerInstance(EntityPredicate.Composite.ANY,
                     ItemPredicate.Builder.item().of(ModItems.SOULFIRE_BOTTLE.get()).build()))
@@ -60,8 +74,9 @@ public class ModAdvancementProvider extends AdvancementProvider {
             .display(simple(ModItems.RESPIRATOR.get(), "protection_from_yellow", FrameType.TASK))
             .parent(root)
             .addCriterion("protecc",
-                new BreatheAirTrigger.Instance(EntityPredicate.Composite.ANY, AirQualityLevel.YELLOW, true, false,
-                    false))
+                new BreatheAirTrigger.Instance(EntityPredicate.Composite.ANY,
+                    EnumSet.of(AirQualityLevel.YELLOW, AirQualityLevel.RED), null,
+                    null))
             .save(advancements, prefix("protection_from_yellow"));
 
         Advancement.Builder.advancement()
@@ -71,7 +86,8 @@ public class ModAdvancementProvider extends AdvancementProvider {
                 null, FrameType.TASK, true, true, false))
             .parent(protectYellow)
             .addCriterion("protecc",
-                new BreatheAirTrigger.Instance(EntityPredicate.Composite.ANY, AirQualityLevel.RED, true, true, false))
+                new BreatheAirTrigger.Instance(EntityPredicate.Composite.ANY, EnumSet.of(AirQualityLevel.RED), null,
+                    Either.right(Unit.INSTANCE)))
             .save(advancements, prefix("protection_from_red"));
 
         var lantern = Advancement.Builder.advancement()

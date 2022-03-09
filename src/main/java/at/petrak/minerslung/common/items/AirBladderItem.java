@@ -33,7 +33,7 @@ public class AirBladderItem extends Item {
 
     @Override
     public void onUsingTick(ItemStack stack, LivingEntity player, int count) {
-        var o2Level = AirHelper.getO2LevelFromLocation(player.getEyePosition(), player.level);
+        var o2Level = AirHelper.getO2LevelFromLocation(player.getEyePosition(), player.level).getFirst();
         stack.getOrCreateTag().putString(TAG_OXYGEN_LEVEL, o2Level.toString());
 
         ServerPlayer maybeSplayer = null;
@@ -46,10 +46,14 @@ public class AirBladderItem extends Item {
         } else if (stack.getDamageValue() < stack.getMaxDamage()) {
             // damage and replenish air
             for (int i = 0; i < 4; i++) {
-                var worked = stack.hurt(1, player.getRandom(), maybeSplayer);
-                if (!worked) break;
+                var failed = stack.hurt(1, player.getRandom(), maybeSplayer);
+                if (failed) {
+                    break;
+                }
                 if (player.getAirSupply() < player.getMaxAirSupply()) {
                     player.setAirSupply(player.getAirSupply() + 1);
+                } else {
+                    break;
                 }
             }
 

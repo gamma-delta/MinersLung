@@ -1,5 +1,5 @@
 {
-  "parent": "minerslung:air_bladder",
+  "parent": "minerslung:soul",
   "display": {
     "icon": {
       "item": "minerslung:soulfire_bottle"
@@ -10,7 +10,7 @@
     "description": {
       "translate": "advancement.minerslung:soulfire_bottle.desc"
     },
-    "frame": "goal",
+    "frame": "task",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false

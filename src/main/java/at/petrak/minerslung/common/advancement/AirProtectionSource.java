@@ -4,8 +4,8 @@ package at.petrak.minerslung.common.advancement;
  * How were you protected from the air?
  */
 public enum AirProtectionSource {
-    ANY,
     NONE,
+    INHERENT,
     BLADDER,
     RESPIRATOR,
     WATER_BREATHING,

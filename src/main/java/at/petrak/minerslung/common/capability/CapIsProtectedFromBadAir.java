@@ -11,17 +11,15 @@ import org.jetbrains.annotations.Nullable;
 public class CapIsProtectedFromBadAir implements ICapabilitySerializable<CompoundTag> {
     public static final String CAP_NAME = "is_protected_from_bad_air";
     public static final String TAG_IS_USING_BLADDER = "is_using_bladder";
-    public static final String TAG_IS_BY_SOUL_CAMPFIRE = "is_by_soul_campfire";
 
-    public boolean isUsingBladder, isBySoulCampfire;
+    public boolean isUsingBladder;
 
-    public CapIsProtectedFromBadAir(boolean isUsingBladder, boolean isBySoulCampfire) {
+    public CapIsProtectedFromBadAir(boolean isUsingBladder) {
         this.isUsingBladder = isUsingBladder;
-        this.isBySoulCampfire = isBySoulCampfire;
     }
 
     public boolean isProtected() {
-        return this.isUsingBladder || this.isBySoulCampfire;
+        return this.isUsingBladder;
     }
 
     @NotNull
@@ -34,13 +32,11 @@ public class CapIsProtectedFromBadAir implements ICapabilitySerializable<Compoun
     public CompoundTag serializeNBT() {
         var tag = new CompoundTag();
         tag.putBoolean(TAG_IS_USING_BLADDER, this.isUsingBladder);
-        tag.putBoolean(TAG_IS_BY_SOUL_CAMPFIRE, this.isBySoulCampfire);
         return tag;
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
         this.isUsingBladder = nbt.getBoolean(TAG_IS_USING_BLADDER);
-        this.isBySoulCampfire = nbt.getBoolean(TAG_IS_BY_SOUL_CAMPFIRE);
     }
 }

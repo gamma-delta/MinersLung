@@ -24,7 +24,8 @@ public class ModClientRenderingAndModelStuff {
             (stack, level, maybeEntity, seed) -> {
                 var entity = maybeEntity != null ? maybeEntity : stack.getEntityRepresentation();
                 if (entity != null) {
-                    return switch (AirHelper.getO2LevelFromLocation(entity.getEyePosition(), entity.getLevel())) {
+                    return switch (AirHelper.getO2LevelFromLocation(entity.getEyePosition(), entity.getLevel())
+                        .getFirst()) {
                         case RED -> 0;
                         case YELLOW -> 1;
                         case BLUE -> 2;

@@ -1,16 +1,15 @@
 package at.petrak.minerslung.common.breath;
 
+import at.petrak.minerslung.common.advancement.AirProtectionSource;
 import at.petrak.minerslung.common.advancement.ModAdvancementTriggers;
-import at.petrak.minerslung.common.capability.ModCapabilities;
+import at.petrak.minerslung.common.items.ModItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
-import java.util.Optional;
 import java.util.Random;
 
 public class TickAirChecker {
@@ -21,44 +20,49 @@ public class TickAirChecker {
         var e = evt.getEntityLiving();
         var world = e.level;
 
-        var o2Level = AirHelper.getO2LevelFromLocation(e.getEyePosition(), e.level);
+        var o2Pair = AirHelper.getO2LevelFromLocation(e.getEyePosition(), e.level);
         var deltaO2 = 0;
-        var wasProtected = false;
-        switch (o2Level) {
-            case GREEN -> deltaO2 = 4;
-            case BLUE -> deltaO2 = 0;
+        var protection = switch (o2Pair.getFirst()) {
+            case GREEN -> {
+                deltaO2 = 4;
+                yield AirProtectionSource.NONE;
+            }
+            case BLUE -> {
+                deltaO2 = 0;
+                yield AirProtectionSource.NONE;
+            }
             case YELLOW -> {
-                Optional<ItemStack> yellowProt = AirHelper.getProtectionFromYellow(e);
-                wasProtected = yellowProt != null;
-                if (yellowProt == null) {
+                var prot = AirHelper.getProtectionFromYellow(e);
+                if (prot == AirProtectionSource.NONE) {
                     if (world.getGameTime() % 4 == 0) {
                         deltaO2 = -1;
                     }
-                } else if (yellowProt.isPresent() && world.getGameTime() % (20 * 15) == 0) {
+                } else if (prot == AirProtectionSource.RESPIRATOR && world.getGameTime() % (20 * 15) == 0) {
                     ServerPlayer maybeSplayer = null;
                     if (e instanceof ServerPlayer splayer) {
                         maybeSplayer = splayer;
                     }
-                    yellowProt.get().hurt(1, RANDOM, maybeSplayer);
+                    var armorItems = e.getArmorSlots();
+                    for (var item : armorItems) {
+                        if (item.is(ModItems.RESPIRATOR.get())) {
+                            item.hurt(1, RANDOM, maybeSplayer);
+                            break;
+                        }
+                    }
                 }
+                yield prot;
             }
             case RED -> {
-                var redProt = AirHelper.isProtectedFromRed(e);
-                wasProtected = redProt;
-                if (!redProt) {
+                var prot = AirHelper.getProtectionFromRed(e);
+                if (prot == AirProtectionSource.NONE) {
                     deltaO2 = -1;
                 }
+                yield prot;
             }
-        }
+        };
 
         if (e instanceof ServerPlayer splayer) {
-            var usedBladder = false;
-            var cap = splayer.getCapability(ModCapabilities.IS_PROTECTED_FROM_AIR).resolve();
-            if (cap.isPresent() && cap.get().isUsingBladder) {
-                usedBladder = true;
-            }
-            ModAdvancementTriggers.BREATHE_AIR.trigger(splayer,
-                o2Level, wasProtected, AirHelper.isUnderwater(splayer.getEyePosition(), splayer.level), usedBladder);
+            ModAdvancementTriggers.BREATHE_AIR.trigger(splayer, o2Pair.getFirst(), o2Pair.getSecond(), protection);
         }
 
         if (deltaO2 != 0) {

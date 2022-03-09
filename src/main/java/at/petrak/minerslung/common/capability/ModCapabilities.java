@@ -30,7 +30,7 @@ public class ModCapabilities {
     public static void attachEntityCaps(AttachCapabilitiesEvent<Entity> evt) {
         if (evt.getObject() instanceof LivingEntity) {
             evt.addCapability(new ResourceLocation(MinersLungMod.MOD_ID, CapIsProtectedFromBadAir.CAP_NAME),
-                new CapIsProtectedFromBadAir(false, false));
+                new CapIsProtectedFromBadAir(false));
         }
     }
 

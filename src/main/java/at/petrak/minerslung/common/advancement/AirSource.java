@@ -1,13 +1,11 @@
 package at.petrak.minerslung.common.advancement;
 
 /**
- * Where are you getting your air from?
+ * Where are you getting your air (or lack of) from?
  */
 public enum AirSource {
-    ANY,
     DIMENSION,
     SOUL,
     LAVA,
-    PORTAL,
-    BLADDER,
+    FLUID,
 }

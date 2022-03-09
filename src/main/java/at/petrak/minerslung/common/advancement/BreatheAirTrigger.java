@@ -2,18 +2,26 @@ package at.petrak.minerslung.common.advancement;
 
 import at.petrak.minerslung.MinersLungMod;
 import at.petrak.minerslung.common.breath.AirQualityLevel;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.mojang.datafixers.util.Either;
 import net.minecraft.advancements.critereon.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.util.Unit;
+
+import javax.annotation.Nullable;
+import java.util.EnumSet;
+import java.util.Locale;
 
 public class BreatheAirTrigger extends SimpleCriterionTrigger<BreatheAirTrigger.Instance> {
     private static final ResourceLocation ID = new ResourceLocation(MinersLungMod.MOD_ID, "breathe_bad_air");
 
-    private static final String TAG_AIR_QUALITY = "air_quality";
+    private static final String TAG_AIR_QUALITIES = "air_qualities";
     private static final String TAG_PROTECTION = "protection";
-    private static final String TAG_UNDERWATER_OK = "underwater_ok";
-    private static final String TAG_BLADDER_OK = "bladder_ok";
+    private static final String TAG_AIR_SOURCE = "air_source";
 
     @Override
     public ResourceLocation getId() {
@@ -23,32 +31,51 @@ public class BreatheAirTrigger extends SimpleCriterionTrigger<BreatheAirTrigger.
     @Override
     protected Instance createInstance(JsonObject json, EntityPredicate.Composite predicate,
         DeserializationContext ctx) {
-        return new Instance(
-            predicate,
-            AirQualityLevel.valueOf(json.get(TAG_AIR_QUALITY).getAsString()),
-            json.get(TAG_PROTECTION).getAsBoolean(),
-            json.get(TAG_UNDERWATER_OK).getAsBoolean(),
-            json.get(TAG_BLADDER_OK).getAsBoolean());
+
+        var allowedQualities = EnumSet.noneOf(AirQualityLevel.class);
+        for (var qualObj : json.getAsJsonArray(TAG_AIR_QUALITIES)) {
+            var qualStr = qualObj.getAsString();
+            allowedQualities.add(AirQualityLevel.valueOf(qualStr.toUpperCase(Locale.ROOT)));
+        }
+        Either<AirProtectionSource, Unit> protection = null;
+        if (json.has(TAG_PROTECTION) && !json.get(TAG_PROTECTION).isJsonNull()) {
+            var protectionStr = GsonHelper.getAsString(json, TAG_PROTECTION).toUpperCase(Locale.ROOT);
+            if (protectionStr.equals("ANY")) {
+                protection = Either.right(Unit.INSTANCE);
+            } else {
+                protection = Either.left(AirProtectionSource.valueOf(protectionStr.toUpperCase(Locale.ROOT)));
+            }
+        }
+        AirSource source = null;
+        if (json.has(TAG_AIR_SOURCE) && !json.get(TAG_AIR_SOURCE).isJsonNull()) {
+            var sourceStr = GsonHelper.getAsString(json, TAG_AIR_SOURCE);
+            source = AirSource.valueOf(sourceStr.toUpperCase(Locale.ROOT));
+        }
+        return new Instance(predicate, allowedQualities, source, protection);
     }
 
-    public void trigger(ServerPlayer player, AirQualityLevel airBreathed, boolean wasProtected, boolean wasUnderwater,
-        boolean usedBladder) {
-        super.trigger(player, inst -> inst.test(airBreathed, wasProtected, wasUnderwater, usedBladder));
+    public void trigger(ServerPlayer player, AirQualityLevel qualityBreathed, AirSource source,
+        AirProtectionSource protection) {
+        super.trigger(player, inst -> inst.test(qualityBreathed, source, protection));
     }
 
     public static class Instance extends AbstractCriterionTriggerInstance {
-        protected final AirQualityLevel airQuality;
-        protected final boolean protection;
-        protected final boolean underwaterOk;
-        protected final boolean bladderOk;
+        protected final EnumSet<AirQualityLevel> allowedQualities;
+        // Null = I don't care
+        @Nullable
+        protected final AirSource airSource;
+        // APS = this specific source
+        // Unit = any existent source (serialized as "any")
+        // Null = don't care
+        @Nullable
+        protected final Either<AirProtectionSource, Unit> protection;
 
-        public Instance(EntityPredicate.Composite predicate, AirQualityLevel airQuality, boolean protection,
-            boolean underwaterOk, boolean bladderOk) {
+        public Instance(EntityPredicate.Composite predicate, EnumSet<AirQualityLevel> allowedQualities,
+            @Nullable AirSource airSource, @Nullable Either<AirProtectionSource, Unit> protection) {
             super(ID, predicate);
+            this.allowedQualities = allowedQualities;
+            this.airSource = airSource;
             this.protection = protection;
-            this.airQuality = airQuality;
-            this.underwaterOk = underwaterOk;
-            this.bladderOk = bladderOk;
         }
 
         @Override
@@ -59,21 +86,33 @@ public class BreatheAirTrigger extends SimpleCriterionTrigger<BreatheAirTrigger.
         @Override
         public JsonObject serializeToJson(SerializationContext ctx) {
             var json = super.serializeToJson(ctx);
-            json.addProperty(TAG_AIR_QUALITY, this.airQuality.toString());
-            json.addProperty(TAG_PROTECTION, this.protection);
-            json.addProperty(TAG_UNDERWATER_OK, this.underwaterOk);
-            json.addProperty(TAG_BLADDER_OK, this.bladderOk);
+
+            var qualities = new JsonArray();
+            for (var qual : this.allowedQualities) {
+                qualities.add(qual.serializedName);
+            }
+            json.add(TAG_AIR_QUALITIES, qualities);
+            if (this.airSource != null) {
+                json.addProperty(TAG_AIR_SOURCE, this.airSource.toString().toLowerCase(Locale.ROOT));
+            } else {
+                json.add(TAG_AIR_SOURCE, JsonNull.INSTANCE);
+            }
+            if (this.protection != null) {
+                var str = this.protection.map(
+                    aps -> aps.toString().toLowerCase(Locale.ROOT),
+                    unit -> "any");
+                json.addProperty(TAG_PROTECTION, str);
+            } else {
+                json.add(TAG_PROTECTION, JsonNull.INSTANCE);
+            }
             return json;
         }
 
-        private boolean test(AirQualityLevel qualityBreathed, boolean wasProtected, boolean wasUnderwater,
-            boolean usedBladder) {
-            // another good use of the implies operator
-            // IF I HAD ONE
-            return this.protection == wasProtected
-                && this.airQuality == qualityBreathed
-                && (!wasUnderwater || this.underwaterOk)
-                && (!usedBladder || this.bladderOk);
+        private boolean test(AirQualityLevel qualityBreathed, AirSource source, AirProtectionSource protection) {
+            return this.allowedQualities.contains(qualityBreathed)
+                && (this.airSource == null || this.airSource == source)
+                && (this.protection == null || this.protection.map(aps -> aps == protection,
+                unit -> protection != AirProtectionSource.NONE));
         }
     }
 }

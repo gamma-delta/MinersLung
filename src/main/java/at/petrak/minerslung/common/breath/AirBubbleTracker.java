@@ -8,6 +8,7 @@ import at.petrak.minerslung.common.network.ModMessages;
 import at.petrak.minerslung.common.network.MsgSyncBubblesSyn;
 import at.petrak.minerslung.common.network.MsgSyncSingleBubbleAck;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
@@ -78,8 +79,10 @@ public class AirBubbleTracker {
     @SubscribeEvent
     public static void onChunkLoad(ChunkEvent.Load evt) {
         // this event happens only on the client
-        var pos = evt.getChunk().getPos();
-        ModMessages.getNetwork().sendToServer(new MsgSyncBubblesSyn(pos.x, pos.z));
+        if (Minecraft.getInstance().getConnection() != null) {
+            var pos = evt.getChunk().getPos();
+            ModMessages.getNetwork().sendToServer(new MsgSyncBubblesSyn(pos.x, pos.z));
+        }
     }
 
     /**

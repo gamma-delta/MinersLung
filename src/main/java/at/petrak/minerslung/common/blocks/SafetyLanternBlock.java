@@ -49,7 +49,7 @@ public class SafetyLanternBlock extends LanternBlock {
     }
 
     private static BlockState setAirQuality(Level world, BlockPos pos, BlockState template) {
-        return template.setValue(AIR_QUALITY, AirHelper.getO2LevelFromLocation(Vec3.atCenterOf(pos), world));
+        return template.setValue(AIR_QUALITY, AirHelper.getO2LevelFromLocation(Vec3.atCenterOf(pos), world).getFirst());
     }
 
     @Nullable
@@ -137,8 +137,7 @@ public class SafetyLanternBlock extends LanternBlock {
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, Random pRandom) {
         pLevel.scheduleTick(pPos, this, 20, TickPriority.NORMAL);
         if (!pState.getValue(LOCKED)) {
-            pLevel.setBlockAndUpdate(pPos,
-                pState.setValue(AIR_QUALITY, AirHelper.getO2LevelFromLocation(Vec3.atCenterOf(pPos), pLevel)));
+            pLevel.setBlockAndUpdate(pPos, setAirQuality(pLevel, pPos, pState));
         }
     }
 

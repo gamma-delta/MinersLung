@@ -1,8 +1,10 @@
 package at.petrak.minerslung.datagen;
 
+import at.petrak.minerslung.common.advancement.AirProtectionSource;
 import at.petrak.minerslung.common.advancement.BreatheAirTrigger;
 import at.petrak.minerslung.common.breath.AirQualityLevel;
 import at.petrak.minerslung.common.items.ModItems;
+import com.mojang.datafixers.util.Either;
 import net.minecraft.advancements.critereon.ChangeDimensionTrigger;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.data.DataGenerator;
@@ -15,6 +17,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.Tags;
 
+import java.util.EnumSet;
 import java.util.function.Consumer;
 
 public class ModCraftingRecipes extends RecipeProvider {
@@ -24,9 +27,9 @@ public class ModCraftingRecipes extends RecipeProvider {
 
     @Override
     protected void buildCraftingRecipes(Consumer<FinishedRecipe> recipes) {
-        var yellowTrigger = new BreatheAirTrigger.Instance(EntityPredicate.Composite.ANY, AirQualityLevel.YELLOW, false,
-            true,
-            true);
+        var yellowTrigger = new BreatheAirTrigger.Instance(EntityPredicate.Composite.ANY,
+            EnumSet.of(AirQualityLevel.YELLOW, AirQualityLevel.RED), null,
+            Either.left(AirProtectionSource.NONE));
         var netherTrigger = ChangeDimensionTrigger.TriggerInstance.changedDimensionTo(Level.NETHER);
 
 

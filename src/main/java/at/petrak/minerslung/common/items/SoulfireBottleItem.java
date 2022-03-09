@@ -23,6 +23,6 @@ public class SoulfireBottleItem extends Item {
         world.playSound(player, player, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.0f, 1.3f);
         world.playSound(player, player, SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.PLAYERS, 1.0f, 0.9f);
         player.awardStat(Stats.ITEM_USED.get(this));
-        return InteractionResultHolder.success(stack);
+        return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
     }
 }
