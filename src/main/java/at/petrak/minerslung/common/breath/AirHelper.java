@@ -4,17 +4,23 @@ import at.petrak.minerslung.MinersLungConfig;
 import at.petrak.minerslung.common.capability.ModCapabilities;
 import at.petrak.minerslung.common.items.ModItems;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.registries.RegistryObject;
+import org.antlr.v4.runtime.misc.Triple;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class AirHelper {
@@ -29,33 +35,12 @@ public class AirHelper {
 
         // Let's throw the player a bone and say the best air quality wins
         AirQualityLevel bestAirBubbleQuality = null;
-        var centerChunkPos = new ChunkPos(new BlockPos(position));
-        // max radius for a campfire is 32, so that means we check two chunks on each side.
-        var chunkRadius = 2;
-        for (int cdx = -chunkRadius; cdx <= chunkRadius; cdx++) {
-            for (int cdz = -chunkRadius; cdz <= chunkRadius; cdz++) {
-                var chunkpos = new ChunkPos(centerChunkPos.x + cdx, centerChunkPos.z + cdz);
-                var chunk = world.getChunkSource().getChunkNow(chunkpos.x, chunkpos.z);
-                if (chunk == null) {
-                    continue;
-                }
-                var maybeCap = chunk.getCapability(ModCapabilities.AIR_BUBBLE_POSITIONS).resolve();
-                if (maybeCap.isEmpty()) {
-                    continue;
-                }
-                var cap = maybeCap.get();
-                for (var pos : cap.entries.keySet()) {
-                    var entry = cap.entries.get(pos);
-                    if (bestAirBubbleQuality == null || !bestAirBubbleQuality.isBetterThan(entry.airQuality())) {
-                        var blockThere = world.getBlockState(pos);
-                        if (AirBubbleTracker.canActuallyProjectAirBubble(blockThere)) {
-                            var distSq = new Vec3(pos.getX(), pos.getY(), pos.getZ()).distanceToSqr(position);
-                            if (distSq < (entry).radius() * entry.radius()) {
-                                bestAirBubbleQuality = entry.airQuality();
-                            }
-                        }
-                    }
-                }
+        for (var pair : AIR_PROJECTORS) {
+            var poi = pair.a.get();
+            var airQuality = pair.b;
+            var radius = pair.c.get();
+            if (world instanceof ServerLevel slevel) {
+                
             }
         }
         if (bestAirBubbleQuality != null) {
@@ -116,4 +101,10 @@ public class AirHelper {
 
         return false;
     }
+
+    private static List<Triple<RegistryObject<PoiType>, AirQualityLevel, ForgeConfigSpec.DoubleValue>> AIR_PROJECTORS = Arrays.asList(
+        new Triple<>(ModPointsOfInterest.SOUL_TORCH, AirQualityLevel.GREEN, MinersLungConfig.soulTorchRange),
+        new Triple<>(ModPointsOfInterest.SOUL_FIRE, AirQualityLevel.GREEN, MinersLungConfig.soulFireRange),
+        new Triple<>(ModPointsOfInterest.SOUL_CAMPFIRE, AirQualityLevel.GREEN, MinersLungConfig.soulCampfireRange)
+    );
 }

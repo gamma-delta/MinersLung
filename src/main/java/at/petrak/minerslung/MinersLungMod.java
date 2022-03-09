@@ -4,7 +4,6 @@ import at.petrak.minerslung.client.ModClientRenderingAndModelStuff;
 import at.petrak.minerslung.common.advancement.ModAdvancementTriggers;
 import at.petrak.minerslung.common.blocks.ModBlocks;
 import at.petrak.minerslung.common.blocks.SignalTorchBlock;
-import at.petrak.minerslung.common.breath.AirBubbleTracker;
 import at.petrak.minerslung.common.breath.DrownedOxygent;
 import at.petrak.minerslung.common.breath.ModPointsOfInterest;
 import at.petrak.minerslung.common.breath.TickAirChecker;
@@ -53,7 +52,6 @@ public class MinersLungMod {
         evbus.register(SignalTorchBlock.class);
         evbus.register(ModCapabilities.class);
         evbus.register(DrownedOxygent.class);
-        evbus.register(AirBubbleTracker.class);
 
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
             modbus.register(ModClientRenderingAndModelStuff.class);
