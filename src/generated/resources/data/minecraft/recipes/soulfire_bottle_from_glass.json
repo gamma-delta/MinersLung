@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    "GSG",
+    " G "
+  ],
+  "key": {
+    "G": {
+      "tag": "forge:glass"
+    },
+    "S": [
+      {
+        "item": "minecraft:soul_sand"
+      },
+      {
+        "item": "minecraft:soul_soil"
+      }
+    ],
+    "C": [
+      {
+        "item": "minecraft:charcoal"
+      },
+      {
+        "item": "minecraft:coal"
+      }
+    ]
+  },
+  "result": {
+    "item": "minerslung:soulfire_bottle",
+    "count": 3
+  }
+}

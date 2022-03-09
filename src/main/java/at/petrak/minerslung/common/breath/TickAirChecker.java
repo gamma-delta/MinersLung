@@ -26,6 +26,7 @@ public class TickAirChecker {
         var wasProtected = false;
         switch (o2Level) {
             case GREEN -> deltaO2 = 4;
+            case BLUE -> deltaO2 = 0;
             case YELLOW -> {
                 Optional<ItemStack> yellowProt = AirHelper.getProtectionFromYellow(e);
                 wasProtected = yellowProt != null;

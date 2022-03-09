@@ -23,7 +23,7 @@ public class ModItemModels extends ItemModelProvider {
 
         AirQualityLevel[] aqs = AirQualityLevel.values();
         for (int i = 0; i < aqs.length; i++) {
-            AirQualityLevel aq = aqs[2 - i];
+            AirQualityLevel aq = aqs[3 - i];
             var name = "lantern_" + aq.getSerializedName();
             simpleItem(modLoc(name));
             var texPath = modLoc("item/" + name);

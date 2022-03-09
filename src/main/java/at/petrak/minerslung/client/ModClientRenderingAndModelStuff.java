@@ -27,10 +27,11 @@ public class ModClientRenderingAndModelStuff {
                     return switch (AirHelper.getO2LevelFromLocation(entity.getEyePosition(), entity.getLevel())) {
                         case RED -> 0;
                         case YELLOW -> 1;
-                        case GREEN -> 2;
+                        case BLUE -> 2;
+                        case GREEN -> 3;
                     };
                 } else {
-                    return 2; // just do green?
+                    return 3; // just do green?
                 }
             });
     }

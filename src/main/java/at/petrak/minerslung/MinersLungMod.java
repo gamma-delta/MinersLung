@@ -6,7 +6,6 @@ import at.petrak.minerslung.common.blocks.ModBlocks;
 import at.petrak.minerslung.common.blocks.SignalTorchBlock;
 import at.petrak.minerslung.common.breath.AirBubbleTracker;
 import at.petrak.minerslung.common.breath.DrownedOxygent;
-import at.petrak.minerslung.common.breath.ModPointsOfInterest;
 import at.petrak.minerslung.common.breath.TickAirChecker;
 import at.petrak.minerslung.common.capability.ModCapabilities;
 import at.petrak.minerslung.common.items.ModItems;
@@ -46,7 +45,6 @@ public class MinersLungMod {
         ModItems.ITEMS.register(modbus);
         ModBlocks.BLOCKS.register(modbus);
         ModLootMods.LOOT_MODS.register(modbus);
-        ModPointsOfInterest.POIS.register(modbus);
         modbus.register(ModDataGenerators.class);
 
         evbus.register(TickAirChecker.class);

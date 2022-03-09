@@ -1,5 +1,6 @@
 package at.petrak.minerslung.common.network;
 
+import at.petrak.minerslung.common.breath.AirBubbleTracker;
 import at.petrak.minerslung.common.capability.ModCapabilities;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
@@ -30,6 +31,7 @@ public record MsgSyncBubblesSyn(int chunkX, int chunkZ) {
                 if (chunk != null) {
                     var maybeCap = chunk.getCapability(ModCapabilities.AIR_BUBBLE_POSITIONS);
                     maybeCap.ifPresent(cap -> {
+                        cap.entries = AirBubbleTracker.recalcChunk(chunk);
                         ModMessages.getNetwork()
                             .send(PacketDistributor.PLAYER.with(() -> sender), new MsgSyncBubblesAck(cap));
                     });

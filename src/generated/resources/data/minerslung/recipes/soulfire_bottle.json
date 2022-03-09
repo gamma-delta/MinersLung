@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:glass_bottle"
+    },
+    {
+      "item": "minecraft:glass_bottle"
+    },
+    {
+      "item": "minecraft:glass_bottle"
+    },
+    [
+      {
+        "item": "minecraft:soul_sand"
+      },
+      {
+        "item": "minecraft:soul_soil"
+      }
+    ],
+    [
+      {
+        "item": "minecraft:charcoal"
+      },
+      {
+        "item": "minecraft:coal"
+      }
+    ]
+  ],
+  "result": {
+    "item": "minerslung:soulfire_bottle",
+    "count": 3
+  }
+}

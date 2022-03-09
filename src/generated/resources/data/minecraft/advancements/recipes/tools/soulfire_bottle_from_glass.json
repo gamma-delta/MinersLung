@@ -2,23 +2,20 @@
   "parent": "minecraft:recipes/root",
   "rewards": {
     "recipes": [
-      "minecraft:prismarine_bottle"
+      "minecraft:soulfire_bottle_from_glass"
     ]
   },
   "criteria": {
     "namesarehard": {
-      "trigger": "minerslung:breathe_bad_air",
+      "trigger": "minecraft:changed_dimension",
       "conditions": {
-        "air_quality": "YELLOW",
-        "protection": false,
-        "underwater_ok": true,
-        "bladder_ok": true
+        "to": "minecraft:the_nether"
       }
     },
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "minecraft:prismarine_bottle"
+        "recipe": "minecraft:soulfire_bottle_from_glass"
       }
     }
   },

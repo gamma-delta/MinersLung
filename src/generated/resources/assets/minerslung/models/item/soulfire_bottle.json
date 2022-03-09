@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "minerslung:item/prismarine_bottle"
+    "layer0": "minerslung:item/soulfire_bottle"
   }
 }

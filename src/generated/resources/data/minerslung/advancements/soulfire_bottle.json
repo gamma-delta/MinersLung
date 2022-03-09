@@ -2,13 +2,13 @@
   "parent": "minerslung:air_bladder",
   "display": {
     "icon": {
-      "item": "minerslung:prismarine_bottle"
+      "item": "minerslung:soulfire_bottle"
     },
     "title": {
-      "translate": "advancement.minerslung:prismarine_bottle"
+      "translate": "advancement.minerslung:soulfire_bottle"
     },
     "description": {
-      "translate": "advancement.minerslung:prismarine_bottle.desc"
+      "translate": "advancement.minerslung:soulfire_bottle.desc"
     },
     "frame": "goal",
     "show_toast": true,
@@ -21,7 +21,7 @@
       "conditions": {
         "item": {
           "items": [
-            "minerslung:prismarine_bottle"
+            "minerslung:soulfire_bottle"
           ]
         }
       }

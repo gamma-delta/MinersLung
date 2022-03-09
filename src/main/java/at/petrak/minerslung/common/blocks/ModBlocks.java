@@ -29,9 +29,9 @@ public class ModBlocks {
             .sound(SoundType.LANTERN)
             .lightLevel(bs -> switch (bs.getValue(SafetyLanternBlock.AIR_QUALITY)) {
                 case GREEN -> 15;
-                case YELLOW -> 12;
-                case RED -> 9;
+                case BLUE -> 12;
+                case YELLOW -> 9;
+                case RED -> 6;
             })
-            .randomTicks()
             .noOcclusion()));
 }

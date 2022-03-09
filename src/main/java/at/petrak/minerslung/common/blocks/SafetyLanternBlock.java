@@ -9,8 +9,10 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -23,6 +25,7 @@ import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.ticks.TickPriority;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
@@ -71,6 +74,12 @@ public class SafetyLanternBlock extends LanternBlock {
     }
 
     @Override
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer,
+        ItemStack pStack) {
+        pLevel.scheduleTick(pPos, this, 20, TickPriority.NORMAL);
+    }
+
+    @Override
     public InteractionResult use(BlockState bs, Level world, BlockPos pos, Player player, InteractionHand hand,
         BlockHitResult pHit) {
         var itemUsed = player.getItemInHand(hand);
@@ -84,6 +93,8 @@ public class SafetyLanternBlock extends LanternBlock {
 
         if (itemUsed.is(Items.GREEN_DYE) && presentLockedAirQuality != AirQualityLevel.GREEN) {
             lockedAirQuality = AirQualityLevel.GREEN;
+        } else if (itemUsed.is(Items.BLUE_DYE) && presentLockedAirQuality != AirQualityLevel.BLUE) {
+            lockedAirQuality = AirQualityLevel.BLUE;
         } else if (itemUsed.is(Items.YELLOW_DYE) && presentLockedAirQuality != AirQualityLevel.YELLOW) {
             lockedAirQuality = AirQualityLevel.YELLOW;
         } else if (itemUsed.is(Items.RED_DYE) && presentLockedAirQuality != AirQualityLevel.RED) {
@@ -123,7 +134,8 @@ public class SafetyLanternBlock extends LanternBlock {
     }
 
     @Override
-    public void randomTick(BlockState pState, ServerLevel pLevel, BlockPos pPos, Random pRandom) {
+    public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, Random pRandom) {
+        pLevel.scheduleTick(pPos, this, 20, TickPriority.NORMAL);
         if (!pState.getValue(LOCKED)) {
             pLevel.setBlockAndUpdate(pPos,
                 pState.setValue(AIR_QUALITY, AirHelper.getO2LevelFromLocation(Vec3.atCenterOf(pPos), pLevel)));
@@ -138,7 +150,8 @@ public class SafetyLanternBlock extends LanternBlock {
     @Override
     public int getAnalogOutputSignal(BlockState pState, Level pLevel, BlockPos pPos) {
         return switch (pState.getValue(AIR_QUALITY)) {
-            case GREEN -> 2;
+            case GREEN -> 3;
+            case BLUE -> 2;
             case YELLOW -> 1;
             case RED -> 0;
         };

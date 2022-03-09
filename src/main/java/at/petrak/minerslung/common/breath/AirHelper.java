@@ -6,8 +6,7 @@ import at.petrak.minerslung.common.items.ModItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -46,9 +45,9 @@ public class AirHelper {
                 var cap = maybeCap.get();
                 for (var pos : cap.entries.keySet()) {
                     var entry = cap.entries.get(pos);
-                    if (bestAirBubbleQuality == null || !bestAirBubbleQuality.isBetterThan(entry.airQuality())) {
+                    if (bestAirBubbleQuality == null || !bestAirBubbleQuality.bubbleBeats(entry.airQuality())) {
                         var blockThere = world.getBlockState(pos);
-                        if (AirBubbleTracker.canActuallyProjectAirBubble(blockThere)) {
+                        if (AirBubbleTracker.canProjectAirBubble(blockThere)) {
                             var distSq = new Vec3(pos.getX(), pos.getY(), pos.getZ()).distanceToSqr(position);
                             if (distSq < (entry).radius() * entry.radius()) {
                                 bestAirBubbleQuality = entry.airQuality();
@@ -62,18 +61,8 @@ public class AirHelper {
             return bestAirBubbleQuality;
         }
 
-        var dim = world.dimension().location().toString();
-        if (MinersLungConfig.noOxygenDimensions.get().contains(dim)) {
-            return AirQualityLevel.RED;
-        } else if (MinersLungConfig.poorOxygenDimensions.get().contains(dim)) {
-            return AirQualityLevel.YELLOW;
-        } else if (MinersLungConfig.getPoorOxygenThresholdDims().containsKey(dim)) {
-            var depth = MinersLungConfig.getPoorOxygenThresholdDims().get(dim);
-            if (position.y < depth) {
-                return AirQualityLevel.YELLOW;
-            }
-        }
-        return AirQualityLevel.GREEN;
+        var dim = world.dimension().location();
+        return MinersLungConfig.getAirQualityAtLevelByDimension(dim, (int) Math.round(position.y));
     }
 
     public static boolean isUnderwater(Vec3 position, Level world) {
@@ -82,7 +71,7 @@ public class AirHelper {
     }
 
     /**
-     * @return `null` if not protected; `Optional.empty` if protected without a respirator;
+     * @return `null` if not protected; `Optional.empty` if protected without a respirator somehow;
      * `Optional.of` if protected with a respirator
      */
     public static @Nullable Optional<ItemStack> getProtectionFromYellow(LivingEntity entity) {
@@ -101,11 +90,7 @@ public class AirHelper {
     }
 
     public static boolean isProtectedFromRed(LivingEntity entity) {
-        var normalProt = entity instanceof ArmorStand
-            || entity.canBreatheUnderwater()
-            || entity instanceof Enemy
-            || entity.hasEffect(MobEffects.WATER_BREATHING);
-        if (normalProt) {
+        if (canAlwaysBreathe(entity)) {
             return true;
         }
 
@@ -115,5 +100,15 @@ public class AirHelper {
         }
 
         return false;
+    }
+
+    public static boolean canAlwaysBreathe(LivingEntity entity) {
+        if (entity.canBreatheUnderwater()
+            || entity.hasEffect(MobEffects.WATER_BREATHING)
+            || (entity instanceof Player player && player.getAbilities().invulnerable)) {
+            return true;
+        }
+        var alwaysOkEntities = MinersLungConfig.alwaysBreathingEntities.get();
+        return alwaysOkEntities.contains(entity.getEncodeId());
     }
 }

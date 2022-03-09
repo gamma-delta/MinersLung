@@ -25,5 +25,7 @@ public class ModMessages {
             MsgSyncBubblesSyn::deserialize, MsgSyncBubblesSyn::handle);
         NETWORK.registerMessage(messageIdx++, MsgSyncBubblesAck.class, MsgSyncBubblesAck::serialize,
             MsgSyncBubblesAck::deserialize, MsgSyncBubblesAck::handle);
+        NETWORK.registerMessage(messageIdx++, MsgSyncSingleBubbleAck.class, MsgSyncSingleBubbleAck::serialize,
+            MsgSyncSingleBubbleAck::deserialize, MsgSyncSingleBubbleAck::handle);
     }
 }

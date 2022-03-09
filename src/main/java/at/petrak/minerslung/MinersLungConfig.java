@@ -1,47 +1,53 @@
 package at.petrak.minerslung;
 
-import com.google.common.collect.Lists;
+import at.petrak.minerslung.common.breath.AirQualityLevel;
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.*;
 
 public class MinersLungConfig {
-    public static ForgeConfigSpec.ConfigValue<List<? extends String>> poorOxygenDimensions;
-    public static ForgeConfigSpec.ConfigValue<List<? extends String>> noOxygenDimensions;
-    public static ForgeConfigSpec.ConfigValue<List<? extends String>> poorOxygenWithThresholdDimensions;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> dimensions;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> alwaysBreathingEntities;
+
     public static ForgeConfigSpec.BooleanValue enableSignalTorches;
     public static ForgeConfigSpec.IntValue drownedChoking;
+
     public static ForgeConfigSpec.DoubleValue soulFireRange;
     public static ForgeConfigSpec.DoubleValue soulCampfireRange;
     public static ForgeConfigSpec.DoubleValue soulTorchRange;
+    public static ForgeConfigSpec.DoubleValue lavaRange;
 
-    private static Map<String, Integer> poorOxygenThresholdDims = null;
-
-    private static final Pattern THRESHOLD_PATTERN = Pattern.compile("([-_a-zA-Z0-9./:]+)=(-?\\d+)");
+    private static Map<ResourceLocation, DimensionEntry> dimensionEntries = null;
 
     public MinersLungConfig(ForgeConfigSpec.Builder builder) {
-        poorOxygenDimensions = builder
-            .comment("Dimensions in which a respirator is always required to breathe")
-            .defineList("poorOxygenDimensions", Lists.newArrayList(
-                "minecraft:the_nether"
-            ), o -> true);
+        dimensions = builder
+            .comment("Air qualities at different heights in different dimensions.",
+                "The syntax is the dimension's resource location, the \"default\" air level in that dimension,",
+                "then any number of height:airlevel pairs separated by commas.",
+                "The air will have that quality starting at that height and above (until the next entry).",
+                "The entries must be in ascending order of height.",
+                "If a dimension doesn't have an entry here, it'll be assumed to be green everywhere.")
+            .defineList("dimensions", Arrays.asList(
+                "minecraft:overworld=yellow,0:green,128:yellow",
+                "minecraft:the_nether=yellow",
+                "minecraft:the_end=red"
+            ), o -> o instanceof String s && parseDimensionLine(s) != null);
 
-        noOxygenDimensions = builder
-            .comment("Dimensions in which a water breathing potion is always required to breathe")
-            .defineList("noOxygenDimensions", Lists.newArrayList(
-                "minecraft:the_end"
-            ), o -> true);
-
-        poorOxygenWithThresholdDimensions = builder
-            .comment(
-                "Dimensions in which a respirator is required below a certain Y level",
-                "Syntax: `dimension_name=ylevel`")
-            .defineList("poorOxygenWithThresholdDimensions", Lists.newArrayList(
-                "minecraft:overworld=0"
-            ), o -> o instanceof String s && THRESHOLD_PATTERN.matcher(s).matches());
+        alwaysBreathingEntities = builder
+            .comment("Entities that can always breathe.",
+                "This is in addition to entities where `.canBreatheUnderwater()` returns true (so, fish and undead),",
+                "and invulnerable players.")
+            .defineList("alwaysBreathingEntities", Arrays.asList(
+                "minecraft:armor_stand",
+                "minecraft:enderman",
+                "minecraft:endermite",
+                "minecraft:shulker",
+                "minecraft:ender_dragon",
+                "minecraft:wither"
+            ), o -> o instanceof String s && ResourceLocation.isValidResourceLocation(s));
 
         enableSignalTorches = builder
             .comment("Whether to allow right-clicking torches to make them spray particle effects")
@@ -51,33 +57,119 @@ public class MinersLungConfig {
             .comment("How much air a Drowned attack removes")
             .defineInRange("drownedChoking", 30, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
+        builder.push("Ranges");
         soulTorchRange = builder
-            .comment("The radius a soul torch projects a bubble of breathable air around it",
-                "Peculiar things may happen if you change this, but breaking and replacing should fix it")
-            .defineInRange("soulCampfireRange", 2.0, 0.0, 32.0);
+            .comment("The radius a soul torch projects a bubble of blue air around it")
+            .defineInRange("soulTorchRange", 2.0, 0.0, 32.0);
         soulFireRange = builder
-            .comment("The radius a soul fire projects a bubble of breathable air around it")
-            .defineInRange("soulCampfireRange", 5.0, 0.0, 32.0);
+            .comment("The radius a soul fire projects a bubble of blue air around it")
+            .defineInRange("soulFireRange", 5.0, 0.0, 32.0);
         soulCampfireRange = builder
-            .comment("The radius a soul campfire projects a bubble of breathable air around it")
+            .comment("The radius a soul campfire projects a bubble of blue air around it")
             .defineInRange("soulCampfireRange", 9.0, 0.0, 32.0);
+        lavaRange = builder
+            .comment("The radius lava blocks project a bubble of red air around it")
+            .defineInRange("soulCampfireRange", 5.0, 0.0, 32.0);
+        builder.pop();
     }
 
-    public static Map<String, Integer> getPoorOxygenThresholdDims() {
-        if (poorOxygenThresholdDims == null) {
-            var list = poorOxygenWithThresholdDimensions.get();
-            poorOxygenThresholdDims = new HashMap<>(list.size());
-            for (var s : list) {
-                var matcher = THRESHOLD_PATTERN.matcher(s);
-                // god i hate java
-                if (matcher.find()) {
-                    var key = matcher.group(1);
-                    var valStr = matcher.group(2);
-                    var val = Integer.parseInt(valStr);
-                    poorOxygenThresholdDims.put(key, val);
+    @Nullable
+    private static Pair<ResourceLocation, DimensionEntry> parseDimensionLine(String line) {
+        var dimensionVals = line.split("=");
+        if (dimensionVals.length != 2) {
+            MinersLungMod.LOGGER.warn("Couldn't parse dimension line {}: couldn't split across `=` into 2 parts", line);
+            return null;
+        }
+
+        var dimkey = ResourceLocation.tryParse(dimensionVals[0]);
+        if (dimkey == null) {
+            MinersLungMod.LOGGER.warn("Couldn't parse dimension line {}: {} isn't a valid resource location", line,
+                dimensionVals[0]);
+            return null;
+        }
+
+        var heightAndRest = dimensionVals[1].split(",", 2);
+        AirQualityLevel baseQuality;
+        try {
+            baseQuality = AirQualityLevel.valueOf(heightAndRest[0].toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            MinersLungMod.LOGGER.warn("Couldn't parse dimension line {}: {} isn't a valid base air quality", line,
+                heightAndRest[0]);
+            return null;
+        }
+
+        var heights = new ArrayList<Pair<Integer, AirQualityLevel>>();
+        if (heightAndRest.length == 2) {
+            var heightPairStrs = heightAndRest[1].split(",");
+            Integer prevHeight = null;
+            for (var heightPairStr : heightPairStrs) {
+                var pairStr = heightPairStr.split(":");
+                if (pairStr.length != 2) {
+                    MinersLungMod.LOGGER.warn("Couldn't parse dimension line {}: couldn't use {} as a height entry",
+                        line,
+                        heightPairStr);
+                    return null;
                 }
+
+                int height;
+                try {
+                    height = Integer.parseInt(pairStr[0]);
+                } catch (NumberFormatException e) {
+                    MinersLungMod.LOGGER.warn("Couldn't parse dimension line {}: {} isn't a valid int", line,
+                        pairStr[0]);
+                    return null;
+                }
+                if (prevHeight != null && height <= prevHeight) {
+                    return null;
+                }
+                prevHeight = height;
+
+                AirQualityLevel quality;
+                try {
+                    quality = AirQualityLevel.valueOf(pairStr[1].toUpperCase(Locale.ROOT));
+                } catch (IllegalArgumentException e) {
+                    MinersLungMod.LOGGER.warn("Couldn't parse dimension line {}: {} isn't a valid air quality", line,
+                        pairStr[1]);
+                    return null;
+                }
+
+                heights.add(new Pair<>(height, quality));
             }
         }
-        return poorOxygenThresholdDims;
+
+        return new Pair<>(dimkey, new DimensionEntry(baseQuality, heights));
+    }
+
+    private record DimensionEntry(AirQualityLevel baseQuality, List<Pair<Integer, AirQualityLevel>> heights) {
+    }
+
+    public static AirQualityLevel getAirQualityAtLevelByDimension(ResourceLocation dimension, int y) {
+        if (dimensionEntries == null) {
+            // parse!
+            var lines = dimensions.get();
+            dimensionEntries = new HashMap<>(lines.size());
+            for (var line : dimensions.get()) {
+                var entry = parseDimensionLine(line);
+                if (entry == null) {
+                    MinersLungMod.LOGGER.warn("Somehow managed to get a bad dimension config past the validator?!");
+                    continue;
+                }
+                dimensionEntries.put(entry.getFirst(), entry.getSecond());
+            }
+        }
+
+        if (dimensionEntries.containsKey(dimension)) {
+            var entry = dimensionEntries.get(dimension);
+            List<Pair<Integer, AirQualityLevel>> heights = entry.heights;
+            for (int i = 0; i < heights.size(); i++) {
+                Pair<Integer, AirQualityLevel> heightPair = heights.get(heights.size() - i - 1);
+                if (y >= heightPair.getFirst()) {
+                    return heightPair.getSecond();
+                }
+            }
+            return entry.baseQuality;
+        } else {
+            return AirQualityLevel.GREEN;
+        }
     }
 }
