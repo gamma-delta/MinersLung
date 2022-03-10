@@ -30,6 +30,7 @@ public class AirHelper {
         var centerChunkPos = new ChunkPos(new BlockPos(position));
         // max radius for a campfire is 32, so that means we check two chunks on each side.
         var chunkRadius = 2;
+        outer:
         for (int cdx = -chunkRadius; cdx <= chunkRadius; cdx++) {
             for (int cdz = -chunkRadius; cdz <= chunkRadius; cdz++) {
                 var chunkpos = new ChunkPos(centerChunkPos.x + cdx, centerChunkPos.z + cdz);
@@ -60,6 +61,10 @@ public class AirHelper {
                                 } // else uh oh
                                 if (source != null) {
                                     bestAirBubbleQuality = new Pair<>(entry.airQuality(), source);
+                                    if (entry.airQuality() == AirQualityLevel.RED) {
+                                        // nothing can get worse than red, so just stop
+                                        break outer;
+                                    }
                                 }
                             }
                         }

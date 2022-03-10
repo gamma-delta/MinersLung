@@ -1,5 +1,6 @@
 package at.petrak.minerslung.common.capability;
 
+import at.petrak.minerslung.common.breath.AirBubble;
 import at.petrak.minerslung.common.breath.AirQualityLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,11 +20,15 @@ import java.util.Map;
 public class CapAirBubblePositions implements ICapabilitySerializable<CompoundTag> {
     public static final String CAP_NAME = "air_bubble_positions";
     public static final String TAG_POSITIONS = "positions", TAG_QUALITY = "air_quality", TAG_RADIUS = "radius";
+    public static final String TAG_SKIP_COUNT_LEFT = "skip_count_left";
 
-    public Map<BlockPos, Entry> entries;
+    public Map<BlockPos, AirBubble> entries;
+    // Number of times we will skip rescanning this.
+    public int skipCountLeft;
 
     public CapAirBubblePositions() {
         this.entries = new HashMap<>();
+        this.skipCountLeft = 0;
     }
 
     @NotNull
@@ -42,8 +47,8 @@ public class CapAirBubblePositions implements ICapabilitySerializable<CompoundTa
         for (var pos : this.entries.keySet()) {
             var entry = this.entries.get(pos);
             positions.add(NbtUtils.writeBlockPos(pos));
-            qualitiesArr[i] = (byte) entry.airQuality.ordinal();
-            radiusesArr[i] = Double.doubleToRawLongBits(entry.radius);
+            qualitiesArr[i] = (byte) entry.airQuality().ordinal();
+            radiusesArr[i] = Double.doubleToRawLongBits(entry.radius());
             i++;
         }
 
@@ -51,6 +56,7 @@ public class CapAirBubblePositions implements ICapabilitySerializable<CompoundTa
         out.put(TAG_POSITIONS, positions);
         out.put(TAG_QUALITY, new ByteArrayTag(qualitiesArr));
         out.put(TAG_RADIUS, new LongArrayTag(radiusesArr));
+        out.putInt(TAG_SKIP_COUNT_LEFT, this.skipCountLeft);
         return out;
     }
 
@@ -63,10 +69,9 @@ public class CapAirBubblePositions implements ICapabilitySerializable<CompoundTa
         this.entries = new HashMap<>(positions.size());
         for (int i = 0; i < positions.size(); i++) {
             entries.put(NbtUtils.readBlockPos(positions.getCompound(i)),
-                new Entry(AirQualityLevel.values()[qualities[i]], Double.longBitsToDouble(radiuses[i])));
+                new AirBubble(AirQualityLevel.values()[qualities[i]], Double.longBitsToDouble(radiuses[i])));
         }
-    }
 
-    public record Entry(AirQualityLevel airQuality, double radius) {
+        this.skipCountLeft = nbt.getInt(TAG_SKIP_COUNT_LEFT);
     }
 }

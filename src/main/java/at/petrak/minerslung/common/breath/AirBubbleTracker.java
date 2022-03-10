@@ -2,87 +2,107 @@ package at.petrak.minerslung.common.breath;
 
 import at.petrak.minerslung.MinersLungConfig;
 import at.petrak.minerslung.MinersLungMod;
-import at.petrak.minerslung.common.capability.CapAirBubblePositions;
 import at.petrak.minerslung.common.capability.ModCapabilities;
-import at.petrak.minerslung.common.network.ModMessages;
-import at.petrak.minerslung.common.network.MsgSyncBubblesSyn;
-import at.petrak.minerslung.common.network.MsgSyncSingleBubbleAck;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class AirBubbleTracker {
-    @SubscribeEvent
-    public static void onBlockPlaced(BlockEvent.EntityPlaceEvent evt) {
-        var bs = evt.getPlacedBlock();
-        var bubble = getPlaceBubble(bs);
-        if (bubble != null) {
-            if (bubble.getSecond().get() != 0.0) {
-                var chunkPos = new ChunkPos(evt.getPos());
-                var chunk = evt.getWorld().getChunkSource().getChunkNow(chunkPos.x, chunkPos.z);
-                if (chunk != null) {
-                    var maybeCap = chunk.getCapability(ModCapabilities.AIR_BUBBLE_POSITIONS);
-                    double radius = bubble.getSecond().get();
-                    maybeCap.ifPresent(cap -> {
-                        var entry = new CapAirBubblePositions.Entry(bubble.getFirst(), radius);
-                        var clobbered =
-                            cap.entries.put(evt.getPos(), entry);
-                        if (clobbered != null) {
-                            MinersLungMod.LOGGER.warn("(server) Clobbered air bubble at {}: {}", evt.getPos(),
-                                clobbered);
-                        }
-                        ModMessages.getNetwork()
-                            .send(PacketDistributor.TRACKING_CHUNK.with(() -> chunk),
-                                new MsgSyncSingleBubbleAck(evt.getPos(), entry));
-                    });
+    public static void onBlockChanged(Level world, BlockPos pos, BlockState old, BlockState now) {
+        var chunkPos = new ChunkPos(pos);
+        var chunk = world.getChunkSource().getChunkNow(chunkPos.x, chunkPos.z);
+        if (chunk != null) {
+            var maybeCap = chunk.getCapability(ModCapabilities.AIR_BUBBLE_POSITIONS);
+            maybeCap.ifPresent(cap -> {
+                if (getPlaceBubble(old) != null) {
+                    // need to remove this
+                    var removed = cap.entries.remove(pos);
+                    if (removed == null) {
+                        MinersLungMod.LOGGER.warn("Didn't remove any air bubbles at {}", pos);
+                    }
                 }
-            }
+
+                var bubble = getPlaceBubble(now);
+                if (bubble != null && bubble.getSecond().get() != 0.0) {
+                    var entry = new AirBubble(bubble.getFirst(), bubble.getSecond().get());
+                    var clobbered =
+                        cap.entries.put(pos, entry);
+                    if (clobbered != null) {
+                        MinersLungMod.LOGGER.warn("Clobbered air bubble at {}: {}", pos, clobbered);
+                    }
+                }
+            });
         }
     }
 
-    @SubscribeEvent
-    public static void onBlockRemoved(BlockEvent.BreakEvent evt) {
-        var bs = evt.getWorld().getBlockState(evt.getPos());
-        if (getPlaceBubble(bs) != null) {
-            var chunkPos = new ChunkPos(evt.getPos());
-            var chunk = evt.getWorld().getChunkSource().getChunkNow(chunkPos.x, chunkPos.z);
-            if (chunk != null) {
-                var maybeCap = chunk.getCapability(ModCapabilities.AIR_BUBBLE_POSITIONS);
-                maybeCap.ifPresent(cap -> {
-                    var removed = cap.entries.remove(evt.getPos());
-                    if (removed == null) {
-                        MinersLungMod.LOGGER.warn("(server) Didn't remove any air bubbles at {}", evt.getPos());
-                    }
-                    ModMessages.getNetwork()
-                        .send(PacketDistributor.TRACKING_CHUNK.with(() -> chunk),
-                            new MsgSyncSingleBubbleAck(evt.getPos(), null));
-                });
-            }
-        }
-    }
+    // Two lists because in a singleplayer world these will be on the same JVM
+    private static final Set<ChunkPos> clientChunksToScan = new HashSet<>();
+    private static final Set<ChunkPos> serverChunksToScan = new HashSet<>();
 
     @SubscribeEvent
     public static void onChunkLoad(ChunkEvent.Load evt) {
-        // this event happens only on the client
-        if (Minecraft.getInstance().getConnection() != null) {
-            var pos = evt.getChunk().getPos();
-            ModMessages.getNetwork().sendToServer(new MsgSyncBubblesSyn(pos.x, pos.z));
+        var world = evt.getWorld();
+        var chunkpos = evt.getChunk().getPos();
+        var chunk = world.getChunkSource().getChunkNow(chunkpos.x, chunkpos.z);
+        if (chunk != null) {
+            var maybeCap = chunk.getCapability(ModCapabilities.AIR_BUBBLE_POSITIONS);
+            maybeCap.ifPresent(cap -> {
+                if (cap.skipCountLeft <= 0) {
+                    cap.skipCountLeft = 4;
+                    var chunksToScan = world.isClientSide() ? clientChunksToScan : serverChunksToScan;
+                    chunksToScan.add(chunkpos);
+                } else {
+                    cap.skipCountLeft--;
+                }
+            });
         }
+
+    }
+
+    @SubscribeEvent
+    public static void consumeReqdChunksClient(TickEvent.ClientTickEvent evt) {
+        for (var chunkpos : clientChunksToScan) {
+            var chunk = Minecraft.getInstance().level.getChunkSource().getChunkNow(chunkpos.x, chunkpos.z);
+            if (chunk != null) {
+                var maybeCap = chunk.getCapability(ModCapabilities.AIR_BUBBLE_POSITIONS).resolve();
+                if (maybeCap.isPresent()) {
+                    var cap = maybeCap.get();
+                    recalcChunk(chunk, cap.entries, true);
+                }
+            }
+        }
+        clientChunksToScan.clear();
+    }
+
+    @SubscribeEvent
+    public static void consumeReqdChunksServer(TickEvent.WorldTickEvent evt) {
+        for (var chunkpos : serverChunksToScan) {
+            var chunk = evt.world.getChunkSource().getChunkNow(chunkpos.x, chunkpos.z);
+            if (chunk != null) {
+                var maybeCap = chunk.getCapability(ModCapabilities.AIR_BUBBLE_POSITIONS).resolve();
+                if (maybeCap.isPresent()) {
+                    var cap = maybeCap.get();
+                    recalcChunk(chunk, cap.entries, false);
+                }
+            }
+        }
+        serverChunksToScan.clear();
     }
 
     /**
@@ -112,10 +132,11 @@ public class AirBubbleTracker {
         }
     }
 
-    public static Map<BlockPos, CapAirBubblePositions.Entry> recalcChunk(LevelChunk chunk) {
+    public static void recalcChunk(LevelChunk chunk, Map<BlockPos, AirBubble> out,
+        boolean isClientSide) {
         var now = System.currentTimeMillis();
 
-        var out = new HashMap<BlockPos, CapAirBubblePositions.Entry>();
+        out.clear();
 
         var minY = chunk.getMinBuildHeight();
         var cornerX = chunk.getPos().getMinBlockX();
@@ -129,14 +150,15 @@ public class AirBubbleTracker {
                     var bs = chunk.getBlockState(pos);
                     var bubble = getPlaceBubble(bs);
                     if (bubble != null) {
-                        out.put(pos, new CapAirBubblePositions.Entry(bubble.getFirst(), bubble.getSecond().get()));
+                        out.put(pos, new AirBubble(bubble.getFirst(), bubble.getSecond().get()));
                     }
                 }
             }
         }
 
-        MinersLungMod.LOGGER.info("Freshly scanned chunk {}, took {} ms", chunk.getPos(),
+        MinersLungMod.LOGGER.info("({}) Freshly scanned chunk {}, took {} ms",
+            isClientSide ? "client" : "server",
+            chunk.getPos(),
             System.currentTimeMillis() - now);
-        return out;
     }
 }

@@ -1,8 +1,8 @@
 package at.petrak.minerslung.common.network;
 
 import at.petrak.minerslung.MinersLungMod;
+import at.petrak.minerslung.common.breath.AirBubble;
 import at.petrak.minerslung.common.breath.AirQualityLevel;
-import at.petrak.minerslung.common.capability.CapAirBubblePositions;
 import at.petrak.minerslung.common.capability.ModCapabilities;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
@@ -22,16 +22,16 @@ import java.util.function.Supplier;
  * <p>
  * The entry will be null on removal.
  */
-public record MsgSyncSingleBubbleAck(BlockPos pos, @Nullable CapAirBubblePositions.Entry entry) {
+public record MsgSyncSingleBubbleAck(BlockPos pos, @Nullable AirBubble entry) {
     public static MsgSyncSingleBubbleAck deserialize(ByteBuf buffer) {
         var buf = new FriendlyByteBuf(buffer);
         var pos = buf.readBlockPos();
-        CapAirBubblePositions.Entry entry = null;
+        AirBubble entry = null;
         var isNotNull = buf.readBoolean();
         if (isNotNull) {
             var airQuality = AirQualityLevel.values()[buf.readByte()];
             var radius = buf.readDouble();
-            entry = new CapAirBubblePositions.Entry(airQuality, radius);
+            entry = new AirBubble(airQuality, radius);
         }
 
         return new MsgSyncSingleBubbleAck(pos, entry);
