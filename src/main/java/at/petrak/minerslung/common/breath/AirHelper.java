@@ -45,27 +45,27 @@ public class AirHelper {
                 var cap = maybeCap.get();
                 for (var pos : cap.entries.keySet()) {
                     var entry = cap.entries.get(pos);
-                    if (bestAirBubbleQuality == null || !bestAirBubbleQuality.getFirst()
-                        .bubbleBeats(entry.airQuality())) {
+                    if (bestAirBubbleQuality == null
+                        || !bestAirBubbleQuality.getFirst().bubbleBeats(entry.airQuality())) {
                         var bs = world.getBlockState(pos);
-                        if (AirBubbleTracker.canProjectAirBubble(bs)) {
-                            var distSq = new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5).distanceToSqr(
-                                position);
-                            if (distSq < entry.radius() * entry.radius()) {
-                                AirSource source = null;
-                                if (bs.is(Blocks.SOUL_CAMPFIRE) || bs.is(Blocks.SOUL_FIRE) || bs.is(
-                                    Blocks.SOUL_TORCH) || bs.is(Blocks.SOUL_WALL_TORCH)) {
-                                    source = AirSource.SOUL;
-                                } else if (bs.is(Blocks.LAVA)) {
-                                    source = AirSource.LAVA;
-                                } // else uh oh
-                                if (source != null) {
-                                    bestAirBubbleQuality = new Pair<>(entry.airQuality(), source);
-                                    if (entry.airQuality() == AirQualityLevel.RED) {
-                                        // nothing can get worse than red, so just stop
-                                        break outer;
-                                    }
-                                }
+                        var distSq = new Vec3(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)
+                            .distanceToSqr(position);
+                        if (AirBubbleTracker.canProjectAirBubble(bs) && distSq < entry.radius() * entry.radius()) {
+                            // we made it!
+                            AirSource source = AirSource.OTHER;
+                            if (bs.is(Blocks.SOUL_CAMPFIRE)
+                                || bs.is(Blocks.SOUL_FIRE)
+                                || bs.is(Blocks.SOUL_TORCH) || bs.is(Blocks.SOUL_WALL_TORCH)) {
+                                source = AirSource.SOUL;
+                            } else if (bs.is(Blocks.LAVA)) {
+                                source = AirSource.LAVA;
+                            } else if (bs.is(Blocks.NETHER_PORTAL)) {
+                                source = AirSource.NETHER_PORTAL;
+                            }
+                            bestAirBubbleQuality = new Pair<>(entry.airQuality(), source);
+                            if (entry.airQuality() == AirQualityLevel.RED) {
+                                // nothing can get worse than red, so just stop
+                                break outer;
                             }
                         }
                     }

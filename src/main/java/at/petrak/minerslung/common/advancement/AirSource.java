@@ -8,4 +8,6 @@ public enum AirSource {
     SOUL,
     LAVA,
     FLUID,
+    NETHER_PORTAL,
+    OTHER,
 }

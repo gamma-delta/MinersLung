@@ -20,12 +20,5 @@ public class ModMessages {
 
     public static void register() {
         int messageIdx = 0;
-
-        NETWORK.registerMessage(messageIdx++, MsgSyncBubblesSyn.class, MsgSyncBubblesSyn::serialize,
-            MsgSyncBubblesSyn::deserialize, MsgSyncBubblesSyn::handle);
-        NETWORK.registerMessage(messageIdx++, MsgSyncBubblesAck.class, MsgSyncBubblesAck::serialize,
-            MsgSyncBubblesAck::deserialize, MsgSyncBubblesAck::handle);
-        NETWORK.registerMessage(messageIdx++, MsgSyncSingleBubbleAck.class, MsgSyncSingleBubbleAck::serialize,
-            MsgSyncSingleBubbleAck::deserialize, MsgSyncSingleBubbleAck::handle);
     }
 }

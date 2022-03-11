@@ -1,5 +1,8 @@
 package at.petrak.minerslung.common.items;
 
+import at.petrak.minerslung.common.advancement.ModAdvancementTriggers;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -19,10 +22,27 @@ public class SoulfireBottleItem extends Item {
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         player.setAirSupply(player.getMaxAirSupply());
         var stack = player.getItemInHand(hand);
-        stack.shrink(1);
+        if (!player.getAbilities().instabuild) {
+            stack.shrink(1);
+        }
         world.playSound(player, player, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.0f, 1.3f);
-        world.playSound(player, player, SoundEvents.BUBBLE_COLUMN_BUBBLE_POP, SoundSource.PLAYERS, 1.0f, 0.9f);
+        world.playSound(player, player, SoundEvents.SOUL_ESCAPE, SoundSource.PLAYERS, 2.0f, 1.1f);
+
+        var look = player.getLookAngle().scale(0.5);
+        for (int i = 0; i < 10; i++) {
+            world.addParticle(ParticleTypes.SOUL,
+                player.getX() + (Math.random() - 0.5) * 0.5 + look.x,
+                player.getEyeY() + (Math.random() - 0.5) * 0.5,
+                player.getZ() + (Math.random() - 0.5) * 0.5 + look.z,
+                (Math.random() - 0.5) * 0.1, Math.random() * 0.1, (Math.random() - 0.5) * 0.1);
+        }
+
         player.awardStat(Stats.ITEM_USED.get(this));
+        // augh
+        if (player instanceof ServerPlayer splayer) {
+            ModAdvancementTriggers.USE_SOULFIRE_BOTTLE.trigger(splayer);
+        }
+
         return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
     }
 }

@@ -32,6 +32,14 @@
         }
       }
     },
+    "blue": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "item": {
+          "tag": "forge:dyes/blue"
+        }
+      }
+    },
     "green": {
       "trigger": "minecraft:item_used_on_block",
       "conditions": {
@@ -45,6 +53,7 @@
     [
       "red",
       "yellow",
+      "blue",
       "green"
     ]
   ]

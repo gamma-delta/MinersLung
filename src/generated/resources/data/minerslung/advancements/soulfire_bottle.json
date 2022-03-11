@@ -17,14 +17,8 @@
   },
   "criteria": {
     "on_use": {
-      "trigger": "minecraft:consume_item",
-      "conditions": {
-        "item": {
-          "items": [
-            "minerslung:soulfire_bottle"
-          ]
-        }
-      }
+      "trigger": "minerslung:use_soulfire_bottle",
+      "conditions": {}
     }
   },
   "requirements": [

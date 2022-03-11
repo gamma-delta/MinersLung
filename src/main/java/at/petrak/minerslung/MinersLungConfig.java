@@ -19,6 +19,7 @@ public class MinersLungConfig {
     public static ForgeConfigSpec.DoubleValue soulCampfireRange;
     public static ForgeConfigSpec.DoubleValue soulTorchRange;
     public static ForgeConfigSpec.DoubleValue lavaRange;
+    public static ForgeConfigSpec.DoubleValue netherPortalRange;
 
     private static Map<ResourceLocation, DimensionEntry> dimensionEntries = null;
 
@@ -55,7 +56,7 @@ public class MinersLungConfig {
 
         drownedChoking = builder
             .comment("How much air a Drowned attack removes")
-            .defineInRange("drownedChoking", 30, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            .defineInRange("drownedChoking", 100, Integer.MIN_VALUE, Integer.MAX_VALUE);
 
         builder.push("Ranges");
         soulTorchRange = builder
@@ -69,7 +70,10 @@ public class MinersLungConfig {
             .defineInRange("soulCampfireRange", 9.0, 0.0, 32.0);
         lavaRange = builder
             .comment("The radius lava blocks project a bubble of red air around it")
-            .defineInRange("soulCampfireRange", 5.0, 0.0, 32.0);
+            .defineInRange("lavaRange", 5.0, 0.0, 32.0);
+        netherPortalRange = builder
+            .comment("The radius nether portal blocks project a bubble of green air around it")
+            .defineInRange("netherPortalRange", 5.0, 0.0, 32.0);
         builder.pop();
     }
 
