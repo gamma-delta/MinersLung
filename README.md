@@ -9,3 +9,5 @@
 
 All these features are configurable, so you can remove the hardcore air mechanics if you like, or (for modpack makers)
 set different dimensions they function in.
+
+[Curseforge Link](https://www.curseforge.com/minecraft/mc-mods/miners-lung)
