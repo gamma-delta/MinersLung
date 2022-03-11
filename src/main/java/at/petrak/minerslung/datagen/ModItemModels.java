@@ -18,8 +18,18 @@ public class ModItemModels extends ItemModelProvider {
     @Override
     protected void registerModels() {
         simpleItem(ModItems.RESPIRATOR.get());
-        simpleItem(ModItems.AIR_BLADDER.get());
         simpleItem(ModItems.SOULFIRE_BOTTLE.get());
+
+        for (int i = 0; i <= 2; i++) {
+            var name = "air_bladder_" + i;
+            simpleItem(modLoc(name));
+            var prop = (float) i / 3f;
+            getBuilder(ModItems.AIR_BLADDER.getId().getPath())
+                .override()
+                .predicate(new ResourceLocation("damage"), prop)
+                .model(new ModelFile.UncheckedModelFile(modLoc("item/" + name)))
+                .end();
+        }
 
         AirQualityLevel[] aqs = AirQualityLevel.values();
         for (int i = 0; i < aqs.length; i++) {

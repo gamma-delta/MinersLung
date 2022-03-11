@@ -46,6 +46,8 @@ public class MinersLungConfig {
                 "minecraft:enderman",
                 "minecraft:endermite",
                 "minecraft:shulker",
+                "minecraft:strider",
+                "minecraft:ghast",
                 "minecraft:ender_dragon",
                 "minecraft:wither"
             ), o -> o instanceof String s && ResourceLocation.isValidResourceLocation(s));
