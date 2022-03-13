@@ -98,4 +98,9 @@ public class AirBladderItem extends Item {
     public int getUseDuration(ItemStack pStack) {
         return 9001;
     }
+
+    @Override
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return slotChanged || oldStack.getItem() != newStack.getItem();
+    }
 }

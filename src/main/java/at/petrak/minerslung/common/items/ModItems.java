@@ -17,7 +17,7 @@ public class ModItems {
         () -> new RespiratorItem(new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_TOOLS)));
     public static RegistryObject<AirBladderItem> AIR_BLADDER = ITEMS.register("air_bladder",
         () -> new AirBladderItem(
-            new Item.Properties().stacksTo(1).durability(300).defaultDurability(0).tab(CreativeModeTab.TAB_TOOLS)));
+            new Item.Properties().stacksTo(1).durability(300).tab(CreativeModeTab.TAB_TOOLS)));
     public static RegistryObject<SoulfireBottleItem> SOULFIRE_BOTTLE = ITEMS.register("soulfire_bottle",
         () -> new SoulfireBottleItem(new Item.Properties().tab(CreativeModeTab.TAB_TOOLS)));
 
