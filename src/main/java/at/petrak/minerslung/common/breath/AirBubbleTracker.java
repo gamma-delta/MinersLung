@@ -20,9 +20,9 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
-import java.util.Set;
 
 public class AirBubbleTracker {
     public static void onBlockChanged(Level world, BlockPos pos, BlockState old, BlockState now) {
@@ -54,8 +54,8 @@ public class AirBubbleTracker {
     }
 
     // Two lists because in a singleplayer world these will be on the same JVM
-    private static final Set<ChunkPos> clientChunksToScan = new HashSet<>();
-    private static final Set<ChunkPos> serverChunksToScan = new HashSet<>();
+    private static final Deque<ChunkPos> clientChunksToScan = new ArrayDeque<>();
+    private static final Deque<ChunkPos> serverChunksToScan = new ArrayDeque<>();
 
     @SubscribeEvent
     public static void onChunkLoad(ChunkEvent.Load evt) {
@@ -63,52 +63,50 @@ public class AirBubbleTracker {
         var chunkpos = evt.getChunk().getPos();
         var chunk = world.getChunkSource().getChunkNow(chunkpos.x, chunkpos.z);
         if (chunk != null) {
-            var maybeCap = chunk.getCapability(ModCapabilities.AIR_BUBBLE_POSITIONS);
-            maybeCap.ifPresent(cap -> {
-                if (cap.skipCountLeft <= 0) {
-                    cap.skipCountLeft = 16;
-                    var chunksToScan = world.isClientSide() ? clientChunksToScan : serverChunksToScan;
-                    chunksToScan.add(chunkpos);
-                } else {
-                    MinersLungMod.LOGGER.debug("Skipping chunk {} ({} left)", chunkpos, cap.skipCountLeft);
-                    cap.skipCountLeft--;
-                }
-                chunk.setUnsaved(true);
-            });
+            var chunksToScan = world.isClientSide() ? clientChunksToScan : serverChunksToScan;
+            chunksToScan.addLast(chunkpos);
         }
     }
 
     @SubscribeEvent
     public static void consumeReqdChunksClient(TickEvent.ClientTickEvent evt) {
-        var selection = clientChunksToScan.stream().limit(4).toList();
-        for (var chunkpos : selection) {
+        if (!clientChunksToScan.isEmpty()) {
+            var chunkpos = clientChunksToScan.removeFirst();
             var chunk = Minecraft.getInstance().level.getChunkSource().getChunkNow(chunkpos.x, chunkpos.z);
             if (chunk != null) {
                 var maybeCap = chunk.getCapability(ModCapabilities.AIR_BUBBLE_POSITIONS).resolve();
                 if (maybeCap.isPresent()) {
                     var cap = maybeCap.get();
-                    recalcChunk(chunk, cap.entries, true);
-                    chunk.setUnsaved(true);
+                    if (cap.skipCountLeft >= 0) {
+                        recalcChunk(chunk, cap.entries);
+                        chunk.setUnsaved(true);
+                        cap.skipCountLeft = 8;
+                    } else {
+                        cap.skipCountLeft--;
+                    }
                 }
             }
-            clientChunksToScan.remove(chunkpos);
         }
     }
 
     @SubscribeEvent
     public static void consumeReqdChunksServer(TickEvent.WorldTickEvent evt) {
-        var selection = serverChunksToScan.stream().limit(4).toList();
-        for (var chunkpos : selection) {
+        if (!serverChunksToScan.isEmpty()) {
+            var chunkpos = serverChunksToScan.removeFirst();
             var chunk = evt.world.getChunkSource().getChunkNow(chunkpos.x, chunkpos.z);
             if (chunk != null) {
                 var maybeCap = chunk.getCapability(ModCapabilities.AIR_BUBBLE_POSITIONS).resolve();
                 if (maybeCap.isPresent()) {
                     var cap = maybeCap.get();
-                    recalcChunk(chunk, cap.entries, false);
-                    chunk.setUnsaved(true);
+                    if (cap.skipCountLeft >= 0) {
+                        recalcChunk(chunk, cap.entries);
+                        chunk.setUnsaved(true);
+                        cap.skipCountLeft = 8;
+                    } else {
+                        cap.skipCountLeft--;
+                    }
                 }
             }
-            serverChunksToScan.remove(chunkpos);
         }
     }
 
@@ -147,10 +145,7 @@ public class AirBubbleTracker {
         }
     }
 
-    public static void recalcChunk(LevelChunk chunk, Map<BlockPos, AirBubble> out,
-        boolean isClientSide) {
-        var now = System.currentTimeMillis();
-
+    public static void recalcChunk(LevelChunk chunk, Map<BlockPos, AirBubble> out) {
         out.clear();
 
         var minY = chunk.getMinBuildHeight();
@@ -170,10 +165,5 @@ public class AirBubbleTracker {
                 }
             }
         }
-
-        MinersLungMod.LOGGER.debug("({}) Freshly scanned chunk {}, took {} ms",
-            isClientSide ? "client" : "server",
-            chunk.getPos(),
-            System.currentTimeMillis() - now);
     }
 }
