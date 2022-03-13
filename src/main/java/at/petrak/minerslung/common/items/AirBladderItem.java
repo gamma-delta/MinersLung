@@ -13,6 +13,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 
 public class AirBladderItem extends Item {
@@ -102,5 +104,20 @@ public class AirBladderItem extends Item {
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
         return slotChanged || oldStack.getItem() != newStack.getItem();
+    }
+
+    @Override
+    public boolean isEnchantable(ItemStack pStack) {
+        return true;
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
+        return enchantment == Enchantments.UNBREAKING || enchantment == Enchantments.MENDING;
+    }
+
+    @Override
+    public boolean canBeDepleted() {
+        return super.canBeDepleted();
     }
 }
