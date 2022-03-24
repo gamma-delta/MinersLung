@@ -15,7 +15,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModLootMods extends GlobalLootModifierProvider {
     public static final DeferredRegister<GlobalLootModifierSerializer<?>> LOOT_MODS = DeferredRegister.create(
-        ForgeRegistries.LOOT_MODIFIER_SERIALIZERS, MinersLungMod.MOD_ID);
+        ForgeRegistries.Keys.LOOT_MODIFIER_SERIALIZERS, MinersLungMod.MOD_ID);
     private static final RegistryObject<PrismarineBottleSer> PRISMARINE_BOTTLE = LOOT_MODS.register(
         "prismarine_bottle", PrismarineBottleSer::new);
     private static final RegistryObject<SafetyLanternSer> SAFETY_LANTERN = LOOT_MODS.register(
