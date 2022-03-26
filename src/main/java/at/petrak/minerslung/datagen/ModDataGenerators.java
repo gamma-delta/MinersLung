@@ -1,6 +1,5 @@
 package at.petrak.minerslung.datagen;
 
-import at.petrak.minerslung.datagen.lootmods.ModLootMods;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 

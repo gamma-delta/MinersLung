@@ -1,15 +1,16 @@
 package at.petrak.minerslung.datagen;
 
+import at.petrak.minerslung.MinersLungMod;
 import at.petrak.minerslung.common.advancement.AirProtectionSource;
 import at.petrak.minerslung.common.advancement.BreatheAirTrigger;
 import at.petrak.minerslung.common.breath.AirQualityLevel;
 import at.petrak.minerslung.common.items.ModItems;
+import at.petrak.paucal.api.datagen.PaucalRecipeProvider;
 import com.mojang.datafixers.util.Either;
 import net.minecraft.advancements.critereon.ChangeDimensionTrigger;
 import net.minecraft.advancements.critereon.EntityPredicate;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.world.item.Items;
@@ -20,9 +21,9 @@ import net.minecraftforge.common.Tags;
 import java.util.EnumSet;
 import java.util.function.Consumer;
 
-public class ModCraftingRecipes extends RecipeProvider {
+public class ModCraftingRecipes extends PaucalRecipeProvider {
     public ModCraftingRecipes(DataGenerator pGenerator) {
-        super(pGenerator);
+        super(pGenerator, MinersLungMod.MOD_ID);
     }
 
     @Override
@@ -54,17 +55,13 @@ public class ModCraftingRecipes extends RecipeProvider {
                 yellowTrigger)
             .save(recipes);
 
-        ShapedRecipeBuilder.shaped(ModItems.SAFETY_LANTERN.get())
-            .define('C', Ingredient.m_204132_(Tags.Items.INGOTS_COPPER))
-            .define('T', Items.REDSTONE_TORCH)
-            .pattern("CCC")
-            .pattern("CTC")
-            .pattern("CCC")
+        ringAll(ModItems.SAFETY_LANTERN.get(), 1, Ingredient.of(Tags.Items.INGOTS_COPPER),
+            Ingredient.of(Items.REDSTONE_TORCH))
             .unlockedBy("namesarehard", yellowTrigger)
             .save(recipes);
 
         ShapedRecipeBuilder.shaped(ModItems.SOULFIRE_BOTTLE.get(), 3)
-            .define('G', Ingredient.m_204132_(Tags.Items.GLASS))
+            .define('G', Ingredient.of(Tags.Items.GLASS))
             .define('S', Ingredient.of(Items.SOUL_SAND, Items.SOUL_SOIL))
             .define('C', Ingredient.of(Items.CHARCOAL, Items.COAL))
             .pattern(" C ")

@@ -3,15 +3,15 @@ package at.petrak.minerslung.datagen;
 import at.petrak.minerslung.MinersLungMod;
 import at.petrak.minerslung.common.blocks.ModBlocks;
 import at.petrak.minerslung.common.blocks.SafetyLanternBlock;
+import at.petrak.paucal.api.datagen.PaucalBlockStateAndModelProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.world.level.block.LanternBlock;
-import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ConfiguredModel;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 import java.util.Locale;
 
-public class ModBlockModels extends BlockStateProvider {
+public class ModBlockModels extends PaucalBlockStateAndModelProvider {
     public ModBlockModels(DataGenerator gen, ExistingFileHelper efh) {
         super(gen, MinersLungMod.MOD_ID, efh);
     }

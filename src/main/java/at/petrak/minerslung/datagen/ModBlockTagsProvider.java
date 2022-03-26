@@ -16,7 +16,7 @@ public class ModBlockTagsProvider extends BlockTagsProvider {
     @Override
     protected void addTags() {
         // presumably, this method is "add tag"
-        this.m_206424_(BlockTags.MINEABLE_WITH_PICKAXE).add(ModBlocks.SAFETY_LANTERN.get());
-        this.m_206424_(BlockTags.WALL_POST_OVERRIDE).add(ModBlocks.SIGNAL_TORCH.get());
+        this.tag(BlockTags.MINEABLE_WITH_PICKAXE).add(ModBlocks.SAFETY_LANTERN.get());
+        this.tag(BlockTags.WALL_POST_OVERRIDE).add(ModBlocks.SIGNAL_TORCH.get());
     }
 }

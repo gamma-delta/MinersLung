@@ -11,7 +11,7 @@ import at.petrak.minerslung.common.capability.ModCapabilities;
 import at.petrak.minerslung.common.items.ModItems;
 import at.petrak.minerslung.common.network.ModMessages;
 import at.petrak.minerslung.datagen.ModDataGenerators;
-import at.petrak.minerslung.datagen.lootmods.ModLootMods;
+import at.petrak.minerslung.datagen.ModLootMods;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;

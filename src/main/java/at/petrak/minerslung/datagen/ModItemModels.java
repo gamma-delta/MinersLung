@@ -3,14 +3,13 @@ package at.petrak.minerslung.datagen;
 import at.petrak.minerslung.MinersLungMod;
 import at.petrak.minerslung.common.breath.AirQualityLevel;
 import at.petrak.minerslung.common.items.ModItems;
+import at.petrak.paucal.api.datagen.PaucalItemModelProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
-public class ModItemModels extends ItemModelProvider {
+public class ModItemModels extends PaucalItemModelProvider {
     public ModItemModels(DataGenerator generator, ExistingFileHelper existingFileHelper) {
         super(generator, MinersLungMod.MOD_ID, existingFileHelper);
     }
@@ -48,23 +47,5 @@ public class ModItemModels extends ItemModelProvider {
         }
         singleTexture("fake_rainbow_lantern", new ResourceLocation("item/generated"),
             "layer0", modLoc("item/lantern_rainbow"));
-    }
-
-    public void simpleItem(Item item) {
-        simpleItem(item.getRegistryName());
-    }
-
-    public void simpleItem(ResourceLocation path) {
-        singleTexture(path.getPath(), new ResourceLocation("item/generated"),
-            "layer0", modLoc("item/" + path.getPath()));
-    }
-
-    public void brandishedItem(Item item) {
-        brandishedItem(item.getRegistryName());
-    }
-
-    public void brandishedItem(ResourceLocation path) {
-        singleTexture(path.getPath(), new ResourceLocation("item/handheld"),
-            "layer0", modLoc("item/" + path.getPath()));
     }
 }
