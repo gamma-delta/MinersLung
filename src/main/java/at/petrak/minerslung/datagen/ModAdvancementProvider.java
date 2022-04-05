@@ -101,16 +101,16 @@ public class ModAdvancementProvider extends AdvancementProvider {
             .parent(lantern)
             .addCriterion("red",
                 new ItemUsedOnBlockTrigger.TriggerInstance(EntityPredicate.Composite.ANY, LocationPredicate.ANY,
-                    ItemPredicate.Builder.item().m_204145_(Tags.Items.DYES_RED).build()))
+                    ItemPredicate.Builder.item().of(Tags.Items.DYES_RED).build()))
             .addCriterion("yellow",
                 new ItemUsedOnBlockTrigger.TriggerInstance(EntityPredicate.Composite.ANY, LocationPredicate.ANY,
-                    ItemPredicate.Builder.item().m_204145_(Tags.Items.DYES_YELLOW).build()))
+                    ItemPredicate.Builder.item().of(Tags.Items.DYES_YELLOW).build()))
             .addCriterion("blue",
                 new ItemUsedOnBlockTrigger.TriggerInstance(EntityPredicate.Composite.ANY, LocationPredicate.ANY,
-                    ItemPredicate.Builder.item().m_204145_(Tags.Items.DYES_BLUE).build()))
+                    ItemPredicate.Builder.item().of(Tags.Items.DYES_BLUE).build()))
             .addCriterion("green",
                 new ItemUsedOnBlockTrigger.TriggerInstance(EntityPredicate.Composite.ANY, LocationPredicate.ANY,
-                    ItemPredicate.Builder.item().m_204145_(Tags.Items.DYES_GREEN).build()))
+                    ItemPredicate.Builder.item().of(Tags.Items.DYES_GREEN).build()))
             .requirements(new String[][]{{"red", "yellow", "blue", "green"}})
             .save(advancements, prefix("disco_lantern"));
 

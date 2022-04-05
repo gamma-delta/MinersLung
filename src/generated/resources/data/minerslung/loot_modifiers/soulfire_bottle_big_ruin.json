@@ -2,21 +2,21 @@
   "conditions": [
     {
       "condition": "forge:loot_table_id",
-      "loot_table_id": "minecraft:chests/stronghold_corridor"
+      "loot_table_id": "minecraft:chests/underwater_ruin_small"
     },
     {
       "condition": "minecraft:random_chance",
-      "chance": 0.5
+      "chance": 0.3
     }
   ],
-  "item": "minerslung:safety_lantern",
+  "item": "minerslung:soulfire_bottle",
   "functions": [
     {
       "function": "minecraft:set_count",
       "count": {
         "type": "minecraft:uniform",
         "min": 1.0,
-        "max": 2.0
+        "max": 3.0
       },
       "add": false
     }

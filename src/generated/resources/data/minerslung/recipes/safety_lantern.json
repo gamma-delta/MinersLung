@@ -1,15 +1,18 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "CCC",
-    "CTC",
-    "CCC"
+    "DCD",
+    "CIC",
+    "DCD"
   ],
   "key": {
     "C": {
       "tag": "forge:ingots/copper"
     },
-    "T": {
+    "D": {
+      "tag": "forge:ingots/copper"
+    },
+    "I": {
       "item": "minecraft:redstone_torch"
     }
   },

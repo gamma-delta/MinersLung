@@ -3,10 +3,19 @@
     {
       "condition": "forge:loot_table_id",
       "loot_table_id": "minecraft:chests/simple_dungeon"
+    },
+    {
+      "condition": "minecraft:random_chance",
+      "chance": 0.3
     }
   ],
-  "chance": 0.3,
-  "min": 1,
-  "max": 1,
-  "type": "minerslung:safety_lantern"
+  "item": "minerslung:safety_lantern",
+  "functions": [
+    {
+      "function": "minecraft:set_count",
+      "count": 1.0,
+      "add": false
+    }
+  ],
+  "type": "paucal:add_item"
 }

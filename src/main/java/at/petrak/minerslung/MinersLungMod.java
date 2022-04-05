@@ -11,7 +11,6 @@ import at.petrak.minerslung.common.capability.ModCapabilities;
 import at.petrak.minerslung.common.items.ModItems;
 import at.petrak.minerslung.common.network.ModMessages;
 import at.petrak.minerslung.datagen.ModDataGenerators;
-import at.petrak.minerslung.datagen.ModLootMods;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
@@ -44,7 +43,6 @@ public class MinersLungMod {
 
         ModItems.ITEMS.register(modbus);
         ModBlocks.BLOCKS.register(modbus);
-        ModLootMods.LOOT_MODS.register(modbus);
         modbus.register(ModDataGenerators.class);
 
         evbus.register(TickAirChecker.class);
