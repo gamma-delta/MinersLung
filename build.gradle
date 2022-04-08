@@ -28,7 +28,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'org.spongepowered.mixin'
 
 def modID = 'minerslung'
-version = '0.2.0'
+version = '0.2.1'
 archivesBaseName = "$modID-1.18.2"
 group = "at.petra-k.$modID" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 
@@ -197,7 +197,7 @@ dependencies {
     // Specify the version of Minecraft to use. If this is any group other than 'net.minecraft', it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency, and its patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.18.2-40.0.19'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.0.42'
 
     compileOnly fg.deobf("at.petra-k.paucal:paucal-1.18.2:0.3.2")
     runtimeOnly fg.deobf("at.petra-k.paucal:paucal-1.18.2:0.3.2")

@@ -124,7 +124,6 @@ public class AirBubbleTracker {
         return (bs.is(Blocks.SOUL_CAMPFIRE) && bs.getValue(CampfireBlock.LIT))
             || bs.is(Blocks.SOUL_FIRE)
             || bs.is(Blocks.SOUL_TORCH) || bs.is(Blocks.SOUL_WALL_TORCH)
-            || bs.is(Blocks.LAVA)
             || bs.is(Blocks.NETHER_PORTAL);
     }
 
@@ -136,8 +135,6 @@ public class AirBubbleTracker {
             return new Pair<>(AirQualityLevel.BLUE, MinersLungConfig.soulFireRange);
         } else if (bs.is(Blocks.SOUL_TORCH) || bs.is(Blocks.SOUL_WALL_TORCH)) {
             return new Pair<>(AirQualityLevel.BLUE, MinersLungConfig.soulTorchRange);
-        } else if (bs.is(Blocks.LAVA)) {
-            return new Pair<>(AirQualityLevel.RED, MinersLungConfig.lavaRange);
         } else if (bs.is(Blocks.NETHER_PORTAL)) {
             return new Pair<>(AirQualityLevel.GREEN, MinersLungConfig.netherPortalRange);
         } else {
