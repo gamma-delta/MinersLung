@@ -48,6 +48,11 @@ public class MinersLungConfig {
                 "minecraft:shulker",
                 "minecraft:strider",
                 "minecraft:ghast",
+                "minecraft:piglin",
+                "minecraft:hoglin",
+                "minecraft:piglin_brute",
+                "minecraft:blaze",
+                "minecraft:magma_cube",
                 "minecraft:ender_dragon",
                 "minecraft:wither"
             ), o -> o instanceof String s && ResourceLocation.isValidResourceLocation(s));
